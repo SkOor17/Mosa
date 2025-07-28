@@ -14,21 +14,39 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Test {
-  id    Int    @id @default(autoincrement())
-  title String
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum GoalType {
+  AMOUNT
+  INVESTMENT
+}
+
+enum Recurrence {
+  MONTHLY
+  ANNUAL
+  OTHER
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
+  id                String             @id
+  name              String
+  email             String
+  emailVerified     Boolean
+  image             String?
+  createdAt         DateTime
+  updatedAt         DateTime
+  sessions          Session[]
+  accounts          Account[]
+  bankAccounts      BankAccountUser[]
+  transactions      Transaction[]
+  categories        Category[]
+  monthlyIncomes    MonthlyIncome[]
+  budgets           Budget[]
+  goals             Goal[]
+  recurringExpenses RecurringExpense[]
 
   @@unique([email])
   @@map("user")
@@ -77,4 +95,95 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model BankAccount {
+  id            Int               @id @default(autoincrement())
+  name          String
+  type          String
+  initialAmount Decimal           @db.Decimal(12, 2)
+  currentAmount Decimal           @db.Decimal(12, 2)
+  users         BankAccountUser[]
+  transactions  Transaction[]
+  goals         GoalAccount[]
+}
+
+model BankAccountUser {
+  id            Int         @id @default(autoincrement())
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id])
+  bankAccountId Int
+  user          User        @relation(fields: [userId], references: [id])
+  userId        String
+  permission    String      @default("owner") // could be enum: OWNER / READ_ONLY
+}
+
+model Transaction {
+  id            Int             @id @default(autoincrement())
+  bankAccount   BankAccount     @relation(fields: [bankAccountId], references: [id])
+  bankAccountId Int
+  user          User            @relation(fields: [userId], references: [id])
+  userId        String
+  category      Category?       @relation(fields: [categoryId], references: [id])
+  categoryId    Int?
+  amount        Decimal         @db.Decimal(12, 2)
+  type          TransactionType
+  description   String?
+  date          DateTime
+}
+
+model Category {
+  id           Int           @id @default(autoincrement())
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
+  name         String
+  transactions Transaction[]
+  budgets      Budget[]
+}
+
+model MonthlyIncome {
+  id     Int      @id @default(autoincrement())
+  user   User     @relation(fields: [userId], references: [id])
+  userId String
+  month  DateTime
+  amount Decimal  @db.Decimal(12, 2)
+}
+
+model Budget {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  month      DateTime
+  maxAmount  Decimal  @db.Decimal(12, 2)
+}
+
+model Goal {
+  id           Int           @id @default(autoincrement())
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
+  type         GoalType
+  name         String?
+  targetDate   DateTime?
+  targetAmount Decimal?      @db.Decimal(12, 2)
+  accounts     GoalAccount[]
+}
+
+model GoalAccount {
+  id            Int         @id @default(autoincrement())
+  goal          Goal        @relation(fields: [goalId], references: [id])
+  goalId        Int
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id])
+  bankAccountId Int
+  percentage    Decimal     @db.Decimal(5, 2)
+}
+
+model RecurringExpense {
+  id         Int        @id @default(autoincrement())
+  user       User       @relation(fields: [userId], references: [id])
+  userId     String
+  name       String
+  amount     Decimal    @db.Decimal(12, 2)
+  startDate  DateTime
+  recurrence Recurrence
 }
