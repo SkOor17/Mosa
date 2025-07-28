@@ -1,15 +1,10 @@
 import { PropsWithChildren } from "react";
-import {getRequiredUser} from "@/src/lib/auth-session";
-import AvatarHeader from "@/src/components/ui/avatar-header";
+import HeaderApp from "@/src/components/ui/header";
 
 export default async function Layout(props: PropsWithChildren) {
-    const user = await getRequiredUser();
-
     return (
-        <div className={"w-full h-screen p-6"}>
-            <div className={"flex justify-end"}>
-                <AvatarHeader user={user}/>
-            </div>
+        <div className={"w-full h-screen"}>
+            <HeaderApp/>
             {props.children}
         </div>
     );
