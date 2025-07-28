@@ -13,7 +13,8 @@ import {
 } from "@/src/components/ui/dropdown-menu";
 import {authClient} from "@/src/lib/auth-client";
 import {useRouter} from "next/navigation";
-import {LogOutIcon} from "lucide-react";
+import {LogOutIcon, UserIcon} from "lucide-react";
+import Link from "next/link";
 
 const AvatarHeader = ({ user }: { user: User }) => {
     const router = useRouter()
@@ -25,7 +26,7 @@ const AvatarHeader = ({ user }: { user: User }) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>
-                <Avatar className={"bg-gray-200"}>
+                <Avatar className={"bg-gray-200 cursor-pointer"}>
                     <AvatarImage src={user.image ?? ""}/>
                     <AvatarFallback>{`${user.name[0].toUpperCase() ?? ""}${user.name.split(" ")[1][0].toUpperCase() ?? ""}`}</AvatarFallback>
                 </Avatar>
@@ -33,7 +34,12 @@ const AvatarHeader = ({ user }: { user: User }) => {
             <DropdownMenuContent className="w-48" align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuGroup>
-                    <DropdownMenuItem onClick={handleDisconnect}>
+                    <DropdownMenuItem className={"cursor-pointer"}>
+                        <Link href={"/profile"} className={"flex gap-2"}>
+                            <UserIcon/> My profile
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleDisconnect} className={"cursor-pointer"}>
                         <LogOutIcon/> Disconnect
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
