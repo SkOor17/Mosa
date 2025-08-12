@@ -9,7 +9,8 @@ import {
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuLabel
+    DropdownMenuLabel,
+    DropdownMenuSeparator
 } from "@/src/components/ui/dropdown-menu";
 import {authClient} from "@/src/lib/auth-client";
 import {useRouter} from "next/navigation";
@@ -33,6 +34,7 @@ const AvatarHeader = ({ user }: { user: User }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48" align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator/>
                 <DropdownMenuGroup>
                     <DropdownMenuItem className={"cursor-pointer"}>
                         <Link href={"/profile"} className={"flex gap-2"}>

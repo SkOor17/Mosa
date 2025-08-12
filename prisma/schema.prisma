@@ -100,7 +100,6 @@ model Verification {
 model BankAccount {
   id            Int               @id @default(autoincrement())
   name          String
-  type          String
   initialAmount Decimal           @db.Decimal(12, 2)
   currentAmount Decimal           @db.Decimal(12, 2)
   users         BankAccountUser[]

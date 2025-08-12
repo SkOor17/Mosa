@@ -12,7 +12,6 @@ import {Button} from "@/src/components/ui/button";
 
 const formSchema = z.object({
     name: z.string().min(1, 'Account name is required'),
-    type: z.string().min(1, 'Account type is required'),
     initialAmount: z.number().nonnegative('Amount must be 0 or more'),
 });
 
@@ -21,7 +20,6 @@ export function AddBankAccountForm() {
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: '',
-            type: '',
             initialAmount: 0,
         },
     });
@@ -51,21 +49,6 @@ export function AddBankAccountForm() {
                             <FormLabel>Account Name</FormLabel>
                             <FormControl>
                                 <Input placeholder="e.g. Livret A" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Account Type</FormLabel>
-                            <FormControl>
-                                <Input
-                                    placeholder="e.g. économies, bourse..." {...field}
-                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

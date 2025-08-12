@@ -19,7 +19,7 @@ const AddBankAccountCard = () => {
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger>
                 <Card className="w-44 cursor-pointer hover:bg-gray-100 transition duration-300">
-                    <CardContent className={"h-20 flex justify-center items-center"}>
+                    <CardContent className={"h-[100px] flex justify-center items-center"}>
                         <SquarePlusIcon/>
                     </CardContent>
                 </Card>
