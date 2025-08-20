@@ -100,7 +100,6 @@ model Verification {
 model BankAccount {
   id            Int               @id @default(autoincrement())
   name          String
-  type          String
   initialAmount Decimal           @db.Decimal(12, 2)
   currentAmount Decimal           @db.Decimal(12, 2)
   users         BankAccountUser[]
@@ -114,13 +113,14 @@ model BankAccountUser {
   bankAccountId Int
   user          User        @relation(fields: [userId], references: [id])
   userId        String
-  permission    String      @default("owner") // could be enum: OWNER / READ_ONLY
+  permission    String      @default("owner")
 }
 
 model Transaction {
   id            Int             @id @default(autoincrement())
   bankAccount   BankAccount     @relation(fields: [bankAccountId], references: [id])
   bankAccountId Int
+  // Remove user relation
   user          User            @relation(fields: [userId], references: [id])
   userId        String
   category      Category?       @relation(fields: [categoryId], references: [id])
@@ -137,6 +137,7 @@ model Category {
   userId       String
   name         String
   transactions Transaction[]
+  // Only one-to-one relation
   budgets      Budget[]
 }
 
@@ -150,6 +151,7 @@ model MonthlyIncome {
 
 model Budget {
   id         Int      @id @default(autoincrement())
+  // Remove User
   user       User     @relation(fields: [userId], references: [id])
   userId     String
   category   Category @relation(fields: [categoryId], references: [id])

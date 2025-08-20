@@ -9,12 +9,14 @@ import {
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuLabel
+    DropdownMenuLabel,
+    DropdownMenuSeparator
 } from "@/src/components/ui/dropdown-menu";
 import {authClient} from "@/src/lib/auth-client";
 import {useRouter} from "next/navigation";
 import {LogOutIcon, UserIcon} from "lucide-react";
 import Link from "next/link";
+import {toast} from "sonner";
 
 const AvatarHeader = ({ user }: { user: User }) => {
     const router = useRouter()
@@ -33,9 +35,10 @@ const AvatarHeader = ({ user }: { user: User }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48" align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator/>
                 <DropdownMenuGroup>
                     <DropdownMenuItem className={"cursor-pointer"}>
-                        <Link href={"/profile"} className={"flex gap-2"}>
+                        <Link href={"/dashboard"} className={"flex gap-2"} onClick={() => toast.info("En développement")}>
                             <UserIcon/> My profile
                         </Link>
                     </DropdownMenuItem>
