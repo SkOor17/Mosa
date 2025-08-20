@@ -14,6 +14,7 @@ export default function SignInPage() {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
+    // TODO: use next-safe-action to handle form submission
     const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 

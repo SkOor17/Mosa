@@ -1,10 +1,10 @@
 import { PropsWithChildren } from "react";
-import {getRequiredUser} from "@/src/lib/auth-session";
+import HeaderApp from "@/src/components/ui/header";
 
 export default async function Layout(props: PropsWithChildren) {
-    await getRequiredUser();
     return (
-        <div>
+        <div className={"w-full"}>
+            <HeaderApp/>
             {props.children}
         </div>
     );
