@@ -16,24 +16,27 @@ import {CalendarIcon} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "@/src/components/ui/popover";
 import {format} from "date-fns";
 import {fr} from "date-fns/locale";
+import React from "react";
 
 const formSchema = z.object({
     amount: z.number('Must be a number').min(0, 'An amount is required'),
     type: z.enum([TransactionType.INCOME, TransactionType.EXPENSE], 'Type is required'),
     description: z.string(),
     date: z.date(),
-    categoryName: z.string('Please select a category').min(0, 'Category is required'),
-    bankAccount: z.string('Please select a bank account').min(0,'The bank account linked is required'),
+    categoryName: z.string('Please select a category').min(1, 'Category is required'),
+    bankAccount: z.string('Please select a bank account').min(1,'The bank account linked is required'),
 });
 
 interface AddTransactionFormProps {
     categories: {
         id: number;
         name: string;
+        default?: boolean;
     }[];
     bankAccounts: {
         id: number;
         name: string;
+        default?: boolean;
     }[];
 }
 
@@ -45,6 +48,8 @@ export function AddTransactionForm({ categories, bankAccounts }: AddTransactionF
             description: '',
             date: new Date(),
             type: TransactionType.EXPENSE,
+            categoryName: categories.find((c) => c.default)?.name || '',
+            bankAccount: bankAccounts.find((ba) => ba.default)?.name || '',
         },
     });
 
@@ -85,7 +90,7 @@ export function AddTransactionForm({ categories, bankAccounts }: AddTransactionF
                         render={({ field }) => (
                             <FormItem className={"flex-1"}>
                                 <FormLabel>Type</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select onValueChange={field.onChange} value={field.value}>
                                     <FormControl>
                                         <SelectTrigger className={"w-full"}>
                                             <SelectValue placeholder="Select transaction type" />
@@ -152,20 +157,46 @@ export function AddTransactionForm({ categories, bankAccounts }: AddTransactionF
                 <FormField
                     control={form.control}
                     name="amount"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Amount</FormLabel>
-                            <FormControl>
-                                <Input
-                                    type="number"
-                                    step="0.01"
-                                    {...field}
-                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+                    render={({ field }) => {
+                        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                            const value = e.target.value;
+
+                            if (value === '') {
+                                field.onChange('');
+                                return;
+                            }
+
+                            const isValidInput = /^\d*\.?\d{0,2}$/.test(value) && !value.startsWith('00');
+
+                            if (isValidInput) {
+                                if (value && !value.endsWith('.') && value !== '0.') {
+                                    const num = parseFloat(value);
+                                    if (!isNaN(num)) {
+                                        field.onChange(num);
+                                        return;
+                                    }
+                                }
+                                field.onChange(value);
+                            }
+                        };
+
+                        return (
+                            <FormItem>
+                                <FormLabel>Amount</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="text"
+                                        inputMode="decimal"
+                                        placeholder="0.00"
+                                        {...field}
+                                        value={field.value ?? ''}
+                                        onChange={handleChange}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        );
+                    }}
                 />
                 <FormField
                     control={form.control}

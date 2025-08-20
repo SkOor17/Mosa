@@ -16,6 +16,7 @@ import {authClient} from "@/src/lib/auth-client";
 import {useRouter} from "next/navigation";
 import {LogOutIcon, UserIcon} from "lucide-react";
 import Link from "next/link";
+import {toast} from "sonner";
 
 const AvatarHeader = ({ user }: { user: User }) => {
     const router = useRouter()
@@ -37,7 +38,7 @@ const AvatarHeader = ({ user }: { user: User }) => {
                 <DropdownMenuSeparator/>
                 <DropdownMenuGroup>
                     <DropdownMenuItem className={"cursor-pointer"}>
-                        <Link href={"/profile"} className={"flex gap-2"}>
+                        <Link href={"/dashboard"} className={"flex gap-2"} onClick={() => toast.info("En développement")}>
                             <UserIcon/> My profile
                         </Link>
                     </DropdownMenuItem>

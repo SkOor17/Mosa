@@ -1,16 +1,10 @@
 "use client"
 
-import React, {useState} from 'react';
-import {
-    AlertDialog,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger
-} from "@/src/components/ui/alert-dialog";
-import {SquarePlusIcon, XIcon} from "lucide-react";
+import React from 'react';
+import {SquarePlusIcon} from "lucide-react";
 import {Button} from "@/src/components/ui/button";
 import {AddTransactionForm} from "@/src/components/forms/add-transaction-form";
+import {ResponsiveModal} from "@/src/components/ui/responsive-modal";
 
 interface AddTransactionFormProps {
     categories: {
@@ -24,28 +18,17 @@ interface AddTransactionFormProps {
 }
 
 const AddTransactionButton = ({ categories, bankAccounts }: AddTransactionFormProps) => {
-    const [isOpen, setIsOpen] = useState(false);
-
     return (
-        <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-            <AlertDialogTrigger asChild>
+        <ResponsiveModal
+            trigger={
                 <Button className={"w-full"}>
                     <SquarePlusIcon/> Nouvelle transaction
                 </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle className={"flex justify-between"}>
-                        Nouvelle transaction
-                        <XIcon
-                            className={"cursor-pointer"}
-                            onClick={() => setIsOpen(false)}
-                        />
-                    </AlertDialogTitle>
-                </AlertDialogHeader>
-                <AddTransactionForm categories={categories} bankAccounts={bankAccounts}/>
-            </AlertDialogContent>
-        </AlertDialog>
+            }
+            title={'Nouvelle transaction}'}
+        >
+                        <AddTransactionForm categories={categories} bankAccounts={bankAccounts}/>
+        </ResponsiveModal>
     );
 };
 
