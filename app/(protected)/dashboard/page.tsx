@@ -7,77 +7,112 @@ import SummaryAccountChart from "@/app/(protected)/dashboard/summary-account-cha
 import AddTransactionButton from "@/src/components/buttons/add-transaction-button";
 
 const Dashboard = async () => {
-    const user = await getRequiredUser()
-    const categories = await prisma.category.findMany({
-        where: {
-            userId: user.id
+        const user = await getRequiredUser();
+
+        // Vérification que l'utilisateur existe
+        if (!user || !user.id) {
+            return <div>Erreur: utilisateur non trouvé</div>;
         }
-    })
 
-    const bankAccounts = await prisma.bankAccountUser.findMany({
-        where: {
-            userId: user.id
-        },
-        include: {
-            bankAccount: true
-        }
-    })
+        const categories = await prisma.category.findMany({
+            where: {
+                userId: user.id
+            }
+        }) || []; // Fallback vers tableau vide
 
-    const bankAccountsProp = bankAccounts.map(ba => ({id: ba.bankAccount.id, name: ba.bankAccount.name}))
+        const bankAccounts = await prisma.bankAccountUser.findMany({
+            where: {
+                userId: user.id
+            },
+            include: {
+                bankAccount: true
+            }
+        }) || []; // Fallback vers tableau vide
 
-    return (
-        <div className={"flex flex-col gap-6 pt-6"}>
-            {/*First section*/}
-            <div className={"flex flex-col gap-4 md:hidden"}>
-                <div>
-                    <h2 className={"text-xl font-semibold"}>Dashboard</h2>
-                    <p className={"text-sm text-gray-600"}>{"Vue d\'ensemble"}</p>
+        // Filtrer les comptes bancaires valides et créer bankAccountsProp
+        const validBankAccounts = bankAccounts.filter(ba => ba?.bankAccount?.id && ba?.bankAccount?.name);
+        const bankAccountsProp = validBankAccounts.map(ba => ({
+            id: ba.bankAccount.id,
+            name: ba.bankAccount.name
+        }));
+
+        return (
+            <div className={"flex flex-col gap-6 pt-6"}>
+                {/*First section*/}
+                <div className={"flex flex-col gap-4 md:hidden"}>
+                    <div>
+                        <h2 className={"text-xl font-semibold"}>Dashboard</h2>
+                        <p className={"text-sm text-gray-600"}>{"Vue d\'ensemble"}</p>
+                    </div>
+                    {categories.length > 0 && bankAccountsProp.length > 0 && (
+                        <div className={"md:hidden"}>
+                            <AddTransactionButton categories={categories} bankAccounts={bankAccountsProp}/>
+                        </div>
+                    )}
                 </div>
-                <div className={"md:hidden"}>
-                    <AddTransactionButton categories={categories} bankAccounts={bankAccountsProp}/>
-                </div>
-            </div>
 
-            <div className={"flex flex-col gap-6 md:flex-row-reverse"}>
-                {/*Bank accounts section*/}
-                <div className={"flex flex-col gap-4 md:min-w-[300px] lg:min-w-[600px]"}>
-                    <h2 className={"text-xl font-semibold"}>Comptes</h2>
-                    <div className={"flex gap-4 overflow-auto pb-4 md:flex-wrap"}>
-                        {bankAccounts.map((bankAccount) => {
-                            const safeBankAccount = {
-                                ...bankAccount.bankAccount,
-                                initialAmount: bankAccount.bankAccount.initialAmount.toNumber(),
-                                currentAmount: bankAccount.bankAccount.currentAmount.toNumber(),
-                            }
+                <div className={"flex flex-col gap-6 md:flex-row-reverse"}>
+                    {/*Bank accounts section*/}
+                    <div className={"flex flex-col gap-4 md:min-w-[300px] lg:min-w-[600px]"}>
+                        <h2 className={"text-xl font-semibold"}>Comptes</h2>
+                        <div className={"flex gap-4 overflow-auto pb-4 md:flex-wrap"}>
+                            {validBankAccounts.length > 0 ? (
+                                validBankAccounts.map((bankAccount) => {
+                                    // Vérification de sécurité supplémentaire
+                                    if (!bankAccount?.bankAccount) {
+                                        return null;
+                                    }
 
-                            return (
-                                <BankAccountCard
-                                    key={bankAccount.id}
-                                    bankAccount={safeBankAccount}
-                                />
-                            )
-                        })}
-                        <AddBankAccountCard/>
+                                    const safeBankAccount = {
+                                        ...bankAccount.bankAccount,
+                                        // Conversion sécurisée des Decimal
+                                        initialAmount: bankAccount.bankAccount.initialAmount
+                                            ? Number(bankAccount.bankAccount.initialAmount)
+                                            : 0,
+                                        currentAmount: bankAccount.bankAccount.currentAmount
+                                            ? Number(bankAccount.bankAccount.currentAmount)
+                                            : 0,
+                                    }
+
+                                    return (
+                                        <BankAccountCard
+                                            key={bankAccount.id}
+                                            bankAccount={safeBankAccount}
+                                        />
+                                    )
+                                })
+                            ) : (
+                                <div className="text-gray-500">Aucun compte bancaire trouvé</div>
+                            )}
+                            <AddBankAccountCard/>
+                        </div>
+                    </div>
+
+                    {/*Summary section*/}
+                    <div className={"flex flex-col gap-4 w-full"}>
+                        <h2 className={"text-xl font-semibold"}>Synthèse des comptes</h2>
+                        {validBankAccounts.length > 0 ? (
+                            <SummaryAccountChart
+                                bankAccounts={validBankAccounts.map(ba => ({
+                                    id: ba.bankAccount.id,
+                                    name: ba.bankAccount.name,
+                                    currentAmount: ba.bankAccount.currentAmount
+                                        ? Number(ba.bankAccount.currentAmount)
+                                        : 0
+                                }))}
+                            />
+                        ) : (
+                            <div className="text-gray-500">Aucune donnée à afficher</div>
+                        )}
+                        {categories.length > 0 && bankAccountsProp.length > 0 && (
+                            <div className={"hidden md:block"}>
+                                <AddTransactionButton categories={categories} bankAccounts={bankAccountsProp}/>
+                            </div>
+                        )}
                     </div>
                 </div>
-
-                {/*Summary section*/}
-                <div className={"flex flex-col gap-4 w-full"}>
-                    <h2 className={"text-xl font-semibold"}>Synthèse des comptes</h2>
-                    <SummaryAccountChart
-                        bankAccounts={bankAccounts.map(ba => ({
-                            id: ba.bankAccount.id,
-                            name: ba.bankAccount.name,
-                            currentAmount: ba.bankAccount.currentAmount.toNumber()
-                        }))}
-                    />
-                    <div className={"hidden md:block"}>
-                        <AddTransactionButton categories={categories} bankAccounts={bankAccountsProp}/>
-                    </div>
-                </div>
             </div>
-        </div>
-    );
+        );
 };
 
 export default Dashboard;
