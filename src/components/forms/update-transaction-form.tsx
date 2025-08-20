@@ -157,7 +157,6 @@ export function UpdateTransactionForm({ transaction, onClose, categories, bankAc
                     )}
                 />
 
-                // TODO: factoriser
                 <FormField
                     control={form.control}
                     name="amount"
