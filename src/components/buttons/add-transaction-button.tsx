@@ -27,7 +27,7 @@ const AddTransactionButton = ({ categories, bankAccounts }: AddTransactionFormPr
             }
             title={'Nouvelle transaction}'}
         >
-                        <AddTransactionForm categories={categories} bankAccounts={bankAccounts}/>
+            <AddTransactionForm categories={categories} bankAccounts={bankAccounts}/>
         </ResponsiveModal>
     );
 };

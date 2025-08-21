@@ -56,7 +56,7 @@ const Dashboard = async () => {
                     <div className={"flex flex-col gap-4 md:min-w-[300px] lg:min-w-[600px]"}>
                         <h2 className={"text-xl font-semibold"}>Comptes</h2>
                         <div className={"flex gap-4 overflow-auto pb-4 md:flex-wrap"}>
-                            {validBankAccounts.length > 0 ? (
+                            {validBankAccounts.length > 0 && (
                                 validBankAccounts.map((bankAccount) => {
                                     // Vérification de sécurité supplémentaire
                                     if (!bankAccount?.bankAccount) {
@@ -81,8 +81,6 @@ const Dashboard = async () => {
                                         />
                                     )
                                 })
-                            ) : (
-                                <div className="text-gray-500">Aucun compte bancaire trouvé</div>
                             )}
                             <AddBankAccountCard/>
                         </div>
