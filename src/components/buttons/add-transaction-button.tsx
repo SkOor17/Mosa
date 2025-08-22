@@ -25,7 +25,7 @@ const AddTransactionButton = ({ categories, bankAccounts }: AddTransactionFormPr
                     <SquarePlusIcon/> Nouvelle transaction
                 </Button>
             }
-            title={'Nouvelle transaction}'}
+            title={'Nouvelle transaction'}
         >
             <AddTransactionForm categories={categories} bankAccounts={bankAccounts}/>
         </ResponsiveModal>

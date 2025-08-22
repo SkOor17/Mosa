@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import {addBankAccountAction} from "@/src/lib/action/bank-account-actions";
 import {Input} from "@/src/components/ui/input";
 import {Button} from "@/src/components/ui/button";
+import React from "react";
 
 const formSchema = z.object({
     name: z.string().min(1, 'Account name is required'),
@@ -57,17 +58,46 @@ export function AddBankAccountForm() {
                 <FormField
                     control={form.control}
                     name="initialAmount"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Initial Amount</FormLabel>
-                            <FormControl>
-                                <Input type="number" step="0.01" {...field}
-                                       onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+                    render={({ field }) => {
+                        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                            const value = e.target.value;
+
+                            if (value === '') {
+                                field.onChange('');
+                                return;
+                            }
+
+                            const isValidInput = /^\d*\.?\d{0,2}$/.test(value) && !value.startsWith('00');
+
+                            if (isValidInput) {
+                                if (value && !value.endsWith('.') && value !== '0.') {
+                                    const num = parseFloat(value);
+                                    if (!isNaN(num)) {
+                                        field.onChange(num);
+                                        return;
+                                    }
+                                }
+                                field.onChange(value);
+                            }
+                        };
+
+                        return (
+                            <FormItem>
+                                <FormLabel>Inital Amount</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="text"
+                                        inputMode="decimal"
+                                        placeholder="0.00"
+                                        {...field}
+                                        value={field.value ?? ''}
+                                        onChange={handleChange}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        );
+                    }}
                 />
                 <Button type="submit" disabled={status === 'executing'}>
                     {status === 'executing' ? 'Creating...' : 'Create Account'}
