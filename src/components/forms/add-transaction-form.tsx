@@ -12,11 +12,13 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/s
 import {Input} from "@/src/components/ui/input";
 import {Button} from "@/src/components/ui/button";
 import { Calendar } from "@/src/components/ui/calendar";
-import {CalendarIcon} from "lucide-react";
+import {CalendarIcon, PlusIcon} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "@/src/components/ui/popover";
 import {format} from "date-fns";
 import {fr} from "date-fns/locale";
-import React from "react";
+import React, {useState} from "react";
+import Link from "next/link";
+import {CategorySelect} from "@/src/components/ui/category-select";
 
 const formSchema = z.object({
     amount: z.number('Must be a number').min(0, 'An amount is required'),
@@ -41,6 +43,8 @@ interface AddTransactionFormProps {
 }
 
 export function AddTransactionForm({ categories, bankAccounts }: AddTransactionFormProps) {
+    const [categoriesState, setCategoriesState] = useState(categories)
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -110,21 +114,18 @@ export function AddTransactionForm({ categories, bankAccounts }: AddTransactionF
                         name="categoryName"
                         render={({ field }) => (
                             <FormItem className={"flex-1"}>
-                                <FormLabel>Category</FormLabel>
-                                <Select onValueChange={field.onChange} value={field?.value || ""}>
-                                    <FormControl>
-                                        <SelectTrigger className={"w-full"}>
-                                            <SelectValue placeholder="Select a category" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {categories.map((categorie) => (
-                                            <SelectItem key={categorie.id} value={categorie.name}>
-                                                {categorie.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <FormLabel>
+                                    Category
+                                </FormLabel>
+                                <FormControl>
+                                    <CategorySelect
+                                        categories={categoriesState}
+                                        value={field.value || ""}
+                                        onValueChange={field.onChange}
+                                        onCategoriesUpdate={setCategoriesState}
+                                        className="w-full"
+                                    />
+                                </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}

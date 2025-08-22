@@ -81,6 +81,7 @@ const TransactionDataTable = async (
 
     const categoryOptions = categories.map((category) => (category.name))
     const bankAccountsProp = bankAccounts.map(ba => ({id: ba.bankAccount.id, name: ba.bankAccount.name, default: ba.bankAccount.id === bankAccountId}))
+    const expenseCategories = await getCategoryExpenses(bankAccountId, user.id)
 
     return (
         <div className={"flex flex-col gap-4"}>
@@ -96,9 +97,11 @@ const TransactionDataTable = async (
                     addButton={<AddTransactionButton categories={categories} bankAccounts={bankAccountsProp}/>}
                 />
             </div>
-            <SummaryExpenseChart
-                expenseCategories={await getCategoryExpenses(bankAccountId, user.id)}
-            />
+            {expenseCategories &&
+                <SummaryExpenseChart
+                    expenseCategories={expenseCategories}
+                />
+            }
         </div>
     );
 };

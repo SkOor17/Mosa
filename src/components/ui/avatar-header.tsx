@@ -38,7 +38,7 @@ const AvatarHeader = ({ user }: { user: User }) => {
                 <DropdownMenuSeparator/>
                 <DropdownMenuGroup>
                     <DropdownMenuItem className={"cursor-pointer"}>
-                        <Link href={"/dashboard"} className={"flex gap-2"} onClick={() => toast.info("En développement")}>
+                        <Link href={"/profile"} className={"flex gap-2"}>
                             <UserIcon/> My profile
                         </Link>
                     </DropdownMenuItem>
