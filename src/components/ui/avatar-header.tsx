@@ -30,7 +30,7 @@ const AvatarHeader = ({ user }: { user: User }) => {
             <DropdownMenuTrigger>
                 <Avatar className={"bg-gray-200 cursor-pointer"}>
                     <AvatarImage src={user.image ?? ""}/>
-                    <AvatarFallback>{`${user.name[0].toUpperCase() ?? ""}${user.name.split(" ")[1][0].toUpperCase() ?? ""}`}</AvatarFallback>
+                    <AvatarFallback>{`${user?.name?.[0]?.toUpperCase() ?? ""}${user?.name?.split(" ")?.[1]?.[0]?.toUpperCase() ?? ""}`}</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48" align="end">
@@ -38,7 +38,7 @@ const AvatarHeader = ({ user }: { user: User }) => {
                 <DropdownMenuSeparator/>
                 <DropdownMenuGroup>
                     <DropdownMenuItem className={"cursor-pointer"}>
-                        <Link href={"/dashboard"} className={"flex gap-2"} onClick={() => toast.info("En développement")}>
+                        <Link href={"/profile"} className={"flex gap-2"}>
                             <UserIcon/> My profile
                         </Link>
                     </DropdownMenuItem>

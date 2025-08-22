@@ -15,10 +15,11 @@ import {parseFrenchDate} from "@/src/lib/utils/date";
 import {Popover, PopoverContent, PopoverTrigger} from "@/src/components/ui/popover";
 import {format} from "date-fns";
 import {fr} from "date-fns/locale";
-import {CalendarIcon} from "lucide-react";
+import {CalendarIcon, PlusIcon} from "lucide-react";
 import {Calendar} from "@/src/components/ui/calendar";
 import {TransactionRow} from "@/app/(protected)/[bankAccountId]/transactions/transaction-actions";
 import React from "react";
+import Link from "next/link";
 
 const formSchema = z.object({
     id: z.number(),
@@ -111,7 +112,12 @@ export function UpdateTransactionForm({ transaction, onClose, categories, bankAc
                         name="categoryName"
                         render={({ field }) => (
                             <FormItem className={"flex-1"}>
-                                <FormLabel>Category</FormLabel>
+                                <FormLabel className={"flex justify-between"}>
+                                    Category
+                                    <Link href={"/profile"}>
+                                        <PlusIcon size={15}/>
+                                    </Link>
+                                </FormLabel>
                                 <Select onValueChange={field.onChange} value={field?.value || ""}>
                                     <FormControl>
                                         <SelectTrigger className={"w-full"}>
@@ -157,7 +163,6 @@ export function UpdateTransactionForm({ transaction, onClose, categories, bankAc
                     )}
                 />
 
-                // TODO: factoriser
                 <FormField
                     control={form.control}
                     name="amount"
