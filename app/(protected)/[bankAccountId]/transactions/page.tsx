@@ -1,9 +1,10 @@
 import React, {Suspense} from 'react';
 import {prisma} from "@/src/lib/prisma";
-import {ChevronLeftIcon, EllipsisVerticalIcon} from "lucide-react";
+import {ChevronLeftIcon} from "lucide-react";
 import Link from "next/link";
 import TransactionDataTable from "@/app/(protected)/[bankAccountId]/transactions/transaction-data-table";
 import TableSkeleton from "@/app/(protected)/[bankAccountId]/transactions/table-skeleton";
+import BankAccountActions from "@/app/(protected)/dashboard/bank-account-actions";
 
 const Page = async (
     {params} : {params: Promise<{bankAccountId: string}>}
@@ -19,7 +20,9 @@ const Page = async (
             <div className={"flex justify-between"}>
                 <Link href={'/dashboard'}><ChevronLeftIcon /></Link>
                 <p>{bankAccount?.name || 'inconnu'} : {bankAccount?.currentAmount.toString()}€</p>
-                <EllipsisVerticalIcon/>
+                <BankAccountActions
+                    bankAccountId={parseInt(bankAccountId)}
+                />
             </div>
             <Suspense fallback={<TableSkeleton/>}>
                 <TransactionDataTable bankAccountId={parseInt(bankAccountId)}/>
