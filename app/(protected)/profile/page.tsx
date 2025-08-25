@@ -1,8 +1,9 @@
 import React from 'react';
 import {getRequiredUser} from "@/src/lib/auth-session";
 import {prisma} from "@/src/lib/prisma";
-import AddCategoryButton from "@/src/components/buttons/add-category-button";
 import {Card, CardContent, CardHeader, CardTitle} from "@/src/components/ui/card";
+import CategoryCard from "@/app/(protected)/profile/category-card";
+import {SerializableCategoryWithBudget, serializeCategory} from "@/src/lib/utils/serialize";
 
 const Page = async () => {
     const user = await getRequiredUser()
@@ -10,6 +11,8 @@ const Page = async () => {
         where: {userId: user.id},
         include: {budget: true}
     });
+
+    const serializableCategories: SerializableCategoryWithBudget[] = categories.map(serializeCategory)
 
     return (
         <div className={"flex flex-col gap-4 pt-6"}>
@@ -22,17 +25,7 @@ const Page = async () => {
                     <p>{user.email}</p>
                 </CardContent>
             </Card>
-            <Card>
-                <CardHeader className={"flex gap-2 justify-between"}>
-                    <CardTitle>Mes catégories</CardTitle>
-                    <AddCategoryButton/>
-                </CardHeader>
-                <CardContent>
-                    {categories.map((category) => (
-                        <p key={category.id}>{category.name} - {category.budget[0]?.percentage?.toString() || 0}%</p>
-                    ))}
-                </CardContent>
-            </Card>
+            <CategoryCard categories={serializableCategories}/>
         </div>
     );
 };

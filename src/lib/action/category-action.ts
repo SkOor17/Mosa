@@ -58,3 +58,61 @@ export const addCategoryAction = actionClient
             budgetPercentage: Number(result.budget.percentage)
         };
     })
+
+const DeleteCategorySchema = z.object({
+    id: z.number().min(1, "L'id de la catégorie est requis"),
+})
+
+export const deleteCategoryAction = actionClient
+    .inputSchema(DeleteCategorySchema)
+    .action(async ({parsedInput: {id}}) => {
+        const user = await getRequiredUser()
+
+        const category = await prisma.category.findFirst({
+            where: {
+                id: id,
+                userId: user.id,
+            },
+            include: {
+                budget: true,
+                transactions: true,
+            }
+        });
+
+        if (!category) {
+            throw new Error("Catégorie introuvable ou vous n'avez pas les permissions pour la supprimer");
+        }
+
+        await prisma.$transaction(async (tx) => {
+            await tx.budget.deleteMany({
+                where: {
+                    categoryId: id,
+                    userId: user.id,
+                }
+            });
+
+            await tx.transaction.updateMany({
+                where: {
+                    categoryId: id,
+                    userId: user.id,
+                },
+                data: {
+                    categoryId: null,
+                }
+            });
+
+            await tx.category.delete({
+                where: {
+                    id: id,
+                    userId: user.id,
+                }
+            });
+        });
+
+        revalidatePath("/profile");
+
+        return {
+            success: true,
+            deletedCategoryId: id,
+        };
+    })
