@@ -32,7 +32,7 @@ const BankAccountActions = (
                 >
                     <EllipsisVerticalIcon size={20} className={"cursor-pointer"}/>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent sideOffset={10}>
+                <DropdownMenuContent sideOffset={10} align={'end'}>
                     <DropdownMenuItem
                         onClick={handleDelete}
                         className={"cursor-pointer"}

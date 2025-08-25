@@ -12,12 +12,11 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/s
 import {Input} from "@/src/components/ui/input";
 import {Button} from "@/src/components/ui/button";
 import { Calendar } from "@/src/components/ui/calendar";
-import {CalendarIcon, PlusIcon} from "lucide-react";
+import {CalendarIcon} from "lucide-react";
 import {Popover, PopoverContent, PopoverTrigger} from "@/src/components/ui/popover";
 import {format} from "date-fns";
 import {fr} from "date-fns/locale";
 import React, {useState} from "react";
-import Link from "next/link";
 import {CategorySelect} from "@/src/components/ui/category-select";
 
 const formSchema = z.object({
@@ -221,7 +220,7 @@ export function AddTransactionForm({ categories, bankAccounts }: AddTransactionF
                                         </Button>
                                     </FormControl>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
+                                <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
                                     <Calendar
                                         mode="single"
                                         selected={field.value}
