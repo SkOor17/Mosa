@@ -18,8 +18,9 @@ import {fr} from "date-fns/locale";
 import {CalendarIcon, PlusIcon} from "lucide-react";
 import {Calendar} from "@/src/components/ui/calendar";
 import {TransactionRow} from "@/app/(protected)/[bankAccountId]/transactions/transaction-actions";
-import React from "react";
+import React, {useState} from "react";
 import Link from "next/link";
+import {CategorySelect} from "@/src/components/ui/category-select";
 
 const formSchema = z.object({
     id: z.number(),
@@ -39,6 +40,8 @@ interface UpdateTransactionFormProps {
 }
 
 export function UpdateTransactionForm({ transaction, onClose, categories, bankAccounts }: UpdateTransactionFormProps) {
+    const [categoriesState, setCategoriesState] = useState(categories)
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -112,26 +115,18 @@ export function UpdateTransactionForm({ transaction, onClose, categories, bankAc
                         name="categoryName"
                         render={({ field }) => (
                             <FormItem className={"flex-1"}>
-                                <FormLabel className={"flex justify-between"}>
+                                <FormLabel>
                                     Category
-                                    <Link href={"/profile"}>
-                                        <PlusIcon size={15}/>
-                                    </Link>
                                 </FormLabel>
-                                <Select onValueChange={field.onChange} value={field?.value || ""}>
-                                    <FormControl>
-                                        <SelectTrigger className={"w-full"}>
-                                            <SelectValue placeholder="Select a category" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {categories.map((categorie) => (
-                                            <SelectItem key={categorie.id} value={categorie.name}>
-                                                {categorie.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <FormControl>
+                                    <CategorySelect
+                                        categories={categoriesState}
+                                        value={field.value || ""}
+                                        onValueChange={field.onChange}
+                                        onCategoriesUpdate={setCategoriesState}
+                                        className="w-full"
+                                    />
+                                </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
