@@ -18,7 +18,7 @@ export const SummaryExpenseChart = (
     return (
         <DonutChart
             data={chartData}
-            title="Dépenses par catégorie"
+            title="Dépenses par catégorie ce mois-ci"
             totalLabel="Total dépensé"
         />
     );

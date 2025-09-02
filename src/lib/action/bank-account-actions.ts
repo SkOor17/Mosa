@@ -34,6 +34,43 @@ export const addBankAccountAction = actionClient
         return {id: bankAccount.id, name: bankAccount.name};
     })
 
+const UpdateBankAccountSchema = z.object({
+    id: z.number().min(1, "L'id du compte bancaire est requis"),
+    name: z.string().min(1, "Le nom du compte bancaire est requis"),
+})
+
+export const updateBankAccountAction = actionClient
+    .inputSchema(UpdateBankAccountSchema)
+    .action(async ({parsedInput: {id, name}}) => {
+        const user = await getRequiredUser()
+
+        // Vérifier que l'utilisateur est bien propriétaire du compte
+        const bankAccountUser = await prisma.bankAccountUser.findFirst({
+            where: {
+                bankAccountId: id,
+                userId: user.id,
+                permission: 'owner',
+            },
+        });
+
+        if (!bankAccountUser) {
+            throw new Error('Compte bancaire introuvable ou vous n\'avez pas les permissions pour le modifier');
+        }
+
+        const updatedBankAccount = await prisma.bankAccount.update({
+            where: { id },
+            data: { name },
+        });
+
+        revalidatePath("/dashboard")
+        revalidatePath("/profile")
+
+        return {
+            id: updatedBankAccount.id,
+            name: updatedBankAccount.name,
+        };
+    })
+
 const RemoveBankAccountSchema = z.object({
     id: z.number().min(0)
 })

@@ -28,12 +28,21 @@ const getData = async (bankAccountId: number | undefined, userId: string) => {
     }))
 }
 
+// TODO: create API route
 const getCategoryExpenses = async (bankAccountId: number, userId: string) => {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
     const transactions = await prisma.transaction.findMany({
         where: {
             bankAccountId: bankAccountId,
             userId: userId,
-            type: 'EXPENSE' // Seulement les dépenses
+            type: 'EXPENSE', // Seulement les dépenses
+            date: {
+                gte: startOfMonth,
+                lte: endOfMonth
+            }
         },
         include: {
             category: true

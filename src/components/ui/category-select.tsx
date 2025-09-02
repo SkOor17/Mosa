@@ -101,12 +101,13 @@ export function CategorySelect({
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className={cn("w-full justify-between", className)}
+                    className={cn("w-full justify-between", className, value || 'text-gray-600')}
                     disabled={isPending}
                 >
                     {value
-                        ? localCategories.find((category) => category.name === value)?.name
-                        : placeholder}
+                        ? localCategories.find((category) => category.name === value)?.name || value
+                        : placeholder
+                    }
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
