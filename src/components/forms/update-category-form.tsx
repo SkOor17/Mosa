@@ -23,6 +23,12 @@ interface UpdateCategoryFormProps {
     onSuccess?: () => void;
 }
 
+type SubmitPayloadType = {
+    id: number
+    name?: string
+    percentage?: number
+}
+
 export function UpdateCategoryForm({
     categoryId,
     initialName = '',
@@ -49,7 +55,7 @@ export function UpdateCategoryForm({
 
     const onSubmit = (values: z.infer<typeof formSchema>) => {
         // Ne pas envoyer les valeurs vides ou inchangées
-        const payload: any = { id: categoryId };
+        const payload: SubmitPayloadType = { id: categoryId };
 
         if (values.name && values.name.trim() !== initialName) {
             payload.name = values.name;

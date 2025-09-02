@@ -15,11 +15,10 @@ import {parseFrenchDate} from "@/src/lib/utils/date";
 import {Popover, PopoverContent, PopoverTrigger} from "@/src/components/ui/popover";
 import {format} from "date-fns";
 import {fr} from "date-fns/locale";
-import {CalendarIcon, PlusIcon} from "lucide-react";
+import {CalendarIcon} from "lucide-react";
 import {Calendar} from "@/src/components/ui/calendar";
 import {TransactionRow} from "@/app/(protected)/[bankAccountId]/transactions/transaction-actions";
 import React, {useState} from "react";
-import Link from "next/link";
 import {CategorySelect} from "@/src/components/ui/category-select";
 
 const formSchema = z.object({
