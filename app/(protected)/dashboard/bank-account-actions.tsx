@@ -10,6 +10,8 @@ import {
 import {EditIcon, EllipsisVerticalIcon, TrashIcon} from "lucide-react";
 import {removeBankAccountAction} from "@/src/lib/action/bank-account-actions";
 import {usePathname, useRouter} from "next/navigation";
+import {ResponsiveModal} from "@/src/components/ui/responsive-modal";
+import {UpdateBankAccountForm} from "@/src/components/forms/update-banck-account-form";
 
 const BankAccountActions = (
     {bankAccountId} :
@@ -40,10 +42,20 @@ const BankAccountActions = (
                         <TrashIcon/>
                         Delete
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <EditIcon/>
-                        Edit
-                    </DropdownMenuItem>
+                    <ResponsiveModal
+                        title={'Modifie ton compte bancaire'}
+                        trigger={
+                            <DropdownMenuItem
+                                className={"cursor-pointer"}
+                                onSelect={(e) => e.preventDefault()}
+                            >
+                                    <EditIcon/>
+                                    Edit
+                            </DropdownMenuItem>
+                        }
+                    >
+                        <UpdateBankAccountForm accountId={bankAccountId}/>
+                    </ResponsiveModal>
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
