@@ -112,11 +112,13 @@ export const updateCategoryAction = actionClient
                 },
             }) : category;
 
-            if (!percentage) return { category: updatedCategory, budget: null }
-
+            // Early return si pas de pourcentage à mettre à jour (undefined ou null)
+            if (percentage === undefined || percentage === null) {
+                return { category: updatedCategory, budget: null };
+            }
 
             // Chercher le budget pour le mois courant
-            const currentBudget = category.budget.find(b =>
+            const currentBudget = category.budget.find(b => 
                 b.month.getTime() === currentMonth.getTime()
             );
 
@@ -149,7 +151,7 @@ export const updateCategoryAction = actionClient
 
         revalidatePath("/dashboard")
         revalidatePath("/profile")
-
+        
         return {
             id: result.category.id,
             name: result.category.name,
@@ -215,3 +217,71 @@ export const deleteCategoryAction = actionClient
             deletedCategoryId: id,
         };
     })
+
+export async function getCategoryData() {
+    const user = await getRequiredUser();
+    
+    // Créer les dates pour le mois courant de manière plus fiable
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth(); // 0-based (0 = janvier)
+    
+    // Premier jour du mois courant à 00:00:00
+    const startOfMonth = new Date(year, month, 1, 0, 0, 0, 0);
+    
+    // Premier jour du mois suivant à 00:00:00
+    const endOfMonth = new Date(year, month + 1, 1, 0, 0, 0, 0);
+    
+    // Récupérer toutes les entrées (revenus) du mois en cours sans grouper par catégorie
+    const totalIncome = await prisma.transaction.aggregate({
+        where: {
+            userId: user.id,
+            type: 'INCOME',
+            date: {
+                gte: startOfMonth,
+                lt: endOfMonth
+            }
+        },
+        _sum: {
+            amount: true
+        }
+    });
+    
+    // Récupérer les dépenses par catégorie pour le mois en cours
+    const expenseTransactions = await prisma.transaction.groupBy({
+        by: ['categoryId'],
+        where: {
+            userId: user.id,
+            type: 'EXPENSE',
+            date: {
+                gte: startOfMonth,
+                lt: endOfMonth
+            }
+        },
+        _sum: {
+            amount: true
+        }
+    });
+    
+    // Créer un Map des dépenses par catégorie (en gérant les categoryId null)
+    const expensesByCategory = new Map(
+        expenseTransactions
+            .filter(t => t.categoryId !== null) // Filtrer les transactions sans catégorie
+            .map(t => [t.categoryId!, Math.abs(Number(t._sum.amount)) || 0])
+    );
+    
+    // Récupérer les dépenses sans catégorie
+    const uncategorizedExpenses = expenseTransactions
+        .filter(t => t.categoryId === null)
+        .reduce((sum, t) => sum + (Math.abs(Number(t._sum.amount)) || 0), 0);
+    
+    return {
+        monthIncome: Number(totalIncome._sum.amount) || 0,
+        expensesByCategory,
+        uncategorizedExpenses,
+        currentMonth: {
+            startDate: startOfMonth,
+            endDate: endOfMonth
+        }
+    };
+}

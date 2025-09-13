@@ -6,15 +6,18 @@ import AddBankAccountCard from "@/app/(protected)/dashboard/add-bank-account-car
 import SummaryAccountChart from "@/app/(protected)/dashboard/summary-account-chart";
 import AddTransactionButton from "@/src/components/buttons/add-transaction-button";
 import { ensureMonthlyBudgets } from '@/src/lib/action/budget-action';
+import CategoryCard from '../profile/category-card';
+import { SerializableCategoryWithBudget, serializeCategory } from '@/src/lib/utils/serialize';
 
 const Dashboard = async () => {
     const user = await getRequiredUser();
 
     const categories = await prisma.category.findMany({
-        where: {
-            userId: user.id
-        }
+        where: { userId: user.id },
+        include: { budget: true }
     }) || [];
+
+    const serializableCategories: SerializableCategoryWithBudget[] = categories.map(serializeCategory)
 
     const bankAccounts = await prisma.bankAccountUser.findMany({
         where: {
@@ -44,7 +47,7 @@ const Dashboard = async () => {
                 </div>
                 {categories.length > 0 && bankAccountsProp.length > 0 && (
                     <div className={"md:hidden"}>
-                        <AddTransactionButton categories={categories} bankAccounts={bankAccountsProp}/>
+                        <AddTransactionButton categories={serializableCategories} bankAccounts={bankAccountsProp}/>
                     </div>
                 )}
             </div>
@@ -82,6 +85,10 @@ const Dashboard = async () => {
                         )}
                         <AddBankAccountCard/>
                     </div>
+                    <CategoryCard 
+                        categories={serializableCategories}
+                        readMode
+                    />
                 </div>
 
                 {/*Summary section*/}
@@ -102,7 +109,7 @@ const Dashboard = async () => {
                     )}
                     {categories.length > 0 && bankAccountsProp.length > 0 && (
                         <div className={"hidden md:block"}>
-                            <AddTransactionButton categories={categories} bankAccounts={bankAccountsProp}/>
+                            <AddTransactionButton categories={serializableCategories} bankAccounts={bankAccountsProp}/>
                         </div>
                     )}
                 </div>
