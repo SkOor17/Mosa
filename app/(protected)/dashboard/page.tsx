@@ -56,13 +56,10 @@ const Dashboard = async () => {
                 {/*Bank accounts section*/}
                 <div className={"flex flex-col gap-4 md:min-w-[300px] lg:min-w-[600px]"}>
                     <h2 className={"text-xl font-semibold"}>Comptes</h2>
-                    <div className={"flex gap-4 overflow-auto pb-4 md:flex-wrap"}>
+                    <div className={"flex gap-4 overflow-auto pb-4"}>
                         {validBankAccounts.length > 0 && (
                             validBankAccounts.map((bankAccount) => {
-                                // Vérification de sécurité supplémentaire
-                                if (!bankAccount?.bankAccount) {
-                                    return null;
-                                }
+                                if (!bankAccount?.bankAccount) return null
 
                                 const safeBankAccount = {
                                     ...bankAccount.bankAccount,
@@ -85,14 +82,11 @@ const Dashboard = async () => {
                         )}
                         <AddBankAccountCard/>
                     </div>
-                    <CategoryCard 
-                        categories={serializableCategories}
-                        readMode
-                    />
+                    <CategoryCard categories={serializableCategories}/>
                 </div>
 
                 {/*Summary section*/}
-                <div className={"flex flex-col gap-4 w-full"}>
+                <div className={"flex flex-col gap-4 w-full flex-1 min-w-[300px]"}>
                     <h2 className={"text-xl font-semibold"}>Synthèse des comptes</h2>
                     {validBankAccounts.length > 0 ? (
                         <SummaryAccountChart

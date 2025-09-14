@@ -7,28 +7,26 @@ import { getCategoryData } from '@/src/lib/action/category-action';
 
 interface CategoryCardProps {
     categories: SerializableCategoryWithBudget[]
-    readMode?: boolean
 } 
 
 const CategoryCard = async (
-    { categories, readMode = false }: CategoryCardProps
+    { categories }: CategoryCardProps
 ) => {
     const { monthIncome, expensesByCategory } = await getCategoryData();
     
     return (
         <Card>
-            <CardHeader className={"flex gap-2 justify-between"}>
-                <CardTitle>Mes catégories</CardTitle>
+            <CardHeader className={"flex gap-2 justify-between items-center pb-4"}>
+                <CardTitle className='text-xl'>Catégories</CardTitle>
                 <AddCategoryButton/>
             </CardHeader>
-            <CardContent className={"flex flex-col gap-3"}>
+            <CardContent className={"space-y-4"}>
                 {categories.map((category) => (
                     <BudgetRow 
                         key={category.id} 
                         category={category} 
                         monthIncome={monthIncome}
                         categoryExpense={expensesByCategory.get(category.id) || 0}
-                        readMode={readMode}
                     />
                 ))}
             </CardContent>
