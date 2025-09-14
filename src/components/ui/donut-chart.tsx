@@ -51,7 +51,7 @@ const DonutChart = ({
     };
 
     return (
-        <Card>
+        <Card className='h-full'>
             <CardHeader>
                 <CardTitle>{title}</CardTitle>
             </CardHeader>

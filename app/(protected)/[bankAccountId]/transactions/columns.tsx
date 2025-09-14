@@ -91,6 +91,22 @@ export const columns = ({ onEdit }: ColumnsProps): ColumnDef<TransactionRow>[] =
     },
     {
         accessorKey: "date",
+        sortingFn: (rowA, rowB, columnId) => {
+            const dateA = rowA.getValue(columnId) as string;
+            const dateB = rowB.getValue(columnId) as string;
+            
+            // Conversion du format dd/mm/yyyy vers Date
+            const parseDate = (dateStr: string): Date => {
+                if (!dateStr) return new Date(0);
+                const [day, month, year] = dateStr.split('/');
+                return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+            };
+            
+            const parsedA = parseDate(dateA);
+            const parsedB = parseDate(dateB);
+            
+            return parsedA.getTime() - parsedB.getTime();
+        },
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Date" />
         ),

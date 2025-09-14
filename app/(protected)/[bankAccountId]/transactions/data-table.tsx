@@ -25,11 +25,10 @@ import {removeTransactionsAction} from "@/src/lib/action/transaction-actions";
 import {useRouter} from "next/navigation";
 import {TransactionRow} from "@/app/(protected)/[bankAccountId]/transactions/transaction-actions";
 import {columns} from "@/app/(protected)/[bankAccountId]/transactions/columns";
-import {DialogContent, DialogHeader, DialogTitle, Dialog, DialogTrigger} from "@/src/components/ui/dialog";
 import {UpdateTransactionForm} from "@/src/components/forms/update-transaction-form";
 import {ResponsiveModal} from "@/src/components/ui/responsive-modal";
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData> {
     data: TData[]
     categoryOptions: string[]
     categories: Array<{id: number, name: string}>
@@ -43,7 +42,7 @@ export function DataTable<TData, TValue>({
     categories,
     bankAccounts,
     addButton,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
     const [sorting, setSorting] = useState<SortingState>([
         {
             id: "date",
