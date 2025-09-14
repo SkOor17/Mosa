@@ -11,7 +11,7 @@ const AddBankAccountCard = () => {
     return (
         <ResponsiveModal
             trigger={
-                <Card className="w-44 cursor-pointer hover:bg-gray-100 transition duration-300">
+                <Card className="w-44 min-w-44 cursor-pointer hover:bg-gray-100 transition duration-300">
                     <CardContent className={"h-[100px] flex justify-center items-center"}>
                         <SquarePlusIcon/>
                     </CardContent>

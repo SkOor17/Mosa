@@ -2,9 +2,12 @@ import {Button} from "@/src/components/ui/button";
 import Link from "next/link";
 import {LogInIcon} from "lucide-react";
 import {getUser} from "@/src/lib/auth-session";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
     const user = await getUser()
+
+    if (user) redirect('/dashboard')
 
     return (
         <div className={"flex flex-col gap-6 justify-center items-center w-full h-screen"}>
@@ -12,8 +15,8 @@ export default async function Home() {
                 <p className={"text-2xl uppercase font-bold"}> Welcome to Mosa </p>
                 <p className={""}> Your financial app to reach your goals </p>
             </div>
-            <Link href={user ? "/dashboard" : "/signin"}>
-                <Button> <LogInIcon/>{user ? "Your dashboard" : "Sign in !"}</Button>
+            <Link href={"/signin"}>
+                <Button> <LogInIcon/>{"Sign in !"}</Button>
             </Link>
         </div>
     );

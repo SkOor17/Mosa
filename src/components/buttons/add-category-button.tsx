@@ -2,7 +2,7 @@
 
 import React from 'react';
 import {Button} from "@/src/components/ui/button";
-import {SquarePlusIcon} from "lucide-react";
+import {PlusIcon} from "lucide-react";
 import {AddCategoryForm} from "@/src/components/forms/add-category-form";
 import {ResponsiveModal} from "@/src/components/ui/responsive-modal";
 
@@ -11,7 +11,7 @@ const AddCategoryButton = () => {
         <ResponsiveModal
             trigger={
                 <Button className={"w-fit"}>
-                    <SquarePlusIcon/> Nouvelle Categorie
+                    <PlusIcon/> Nouvelle Categorie
                 </Button>
             }
             title={'Nouvelle Categorie'}

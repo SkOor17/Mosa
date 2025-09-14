@@ -223,7 +223,7 @@ export function UpdateTransactionForm({ transaction, onClose, categories, bankAc
                                         </Button>
                                     </FormControl>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
+                                <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
                                     <Calendar
                                         mode="single"
                                         selected={field.value}
