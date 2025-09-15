@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { unauthorized } from "next/navigation";
+import { redirect, unauthorized } from "next/navigation";
 import { auth } from "./auth"; // path to your Better Auth server instance
 
 // Retrieve the user of the session
@@ -15,7 +15,7 @@ export const getUser = async () => {
 export const getRequiredUser = async () => {
     const user = await getUser();
 
-    if (!user) unauthorized();
+    if (!user) redirect('/');
 
     return user;
 };
