@@ -60,7 +60,7 @@ export const addTransactionAction = actionClient
         // Création de la transaction
         const createdTransaction = await prisma.transaction.create({
             data: {
-                amount: formattedAmount,
+                amount,
                 type,
                 description,
                 date,
@@ -216,7 +216,7 @@ export const updateTransactionAction = actionClient
             const updatedTransaction = await tx.transaction.update({
                 where: { id },
                 data: {
-                    amount: newFormattedAmount,
+                    amount,
                     type,
                     description,
                     date,
