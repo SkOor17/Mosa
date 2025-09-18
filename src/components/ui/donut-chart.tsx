@@ -26,6 +26,8 @@ const DonutChart = ({
     currency = "€",
     locale = "fr-FR"
 }: DonutChartProps) => {
+    if (data.length === 0) return
+    
     const chartData = data.map((item, index) => ({
         name: item.name,
         amount: item.amount,

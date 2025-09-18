@@ -75,7 +75,7 @@ const Dashboard = async () => {
                                 return (
                                     <BankAccountCard
                                         key={bankAccount.id}
-                                        bankAccount={safeBankAccount}
+                                        bankAccount={safeBankAccount} 
                                     />
                                 )
                             })

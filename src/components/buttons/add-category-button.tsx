@@ -11,7 +11,7 @@ const AddCategoryButton = () => {
         <ResponsiveModal
             trigger={
                 <Button className={"w-fit"}>
-                    <PlusIcon/> Nouvelle Categorie
+                    <PlusIcon/> Ajouter
                 </Button>
             }
             title={'Nouvelle Categorie'}

@@ -18,6 +18,7 @@ import {format} from "date-fns";
 import {fr} from "date-fns/locale";
 import React, {useState} from "react";
 import {CategorySelect} from "@/src/components/ui/category-select";
+import AmountFormField from '../form-fields/amount-form-field';
 
 const formSchema = z.object({
     amount: z.number('Must be a number').min(0, 'An amount is required'),
@@ -154,50 +155,7 @@ export function AddTransactionForm({ categories, bankAccounts }: AddTransactionF
                         </FormItem>
                     )}
                 />
-                <FormField
-                    control={form.control}
-                    name="amount"
-                    render={({ field }) => {
-                        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                            const value = e.target.value;
-
-                            if (value === '') {
-                                field.onChange('');
-                                return;
-                            }
-
-                            const isValidInput = /^\d*\.?\d{0,2}$/.test(value) && !value.startsWith('00');
-
-                            if (isValidInput) {
-                                if (value && !value.endsWith('.') && value !== '0.') {
-                                    const num = parseFloat(value);
-                                    if (!isNaN(num)) {
-                                        field.onChange(num);
-                                        return;
-                                    }
-                                }
-                                field.onChange(value);
-                            }
-                        };
-
-                        return (
-                            <FormItem>
-                                <FormLabel>Amount</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="text"
-                                        inputMode="decimal"
-                                        placeholder="0.00"
-                                        {...field}
-                                        value={field.value ?? ''}
-                                        onChange={handleChange}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        );
-                    }}
-                />
+                <AmountFormField form={form}/>
                 <FormField
                     control={form.control}
                     name="date"
