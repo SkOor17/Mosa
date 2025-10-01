@@ -11,7 +11,7 @@ const HeaderApp = async () => {
         <div className={"w-full flex items-center justify-between"}>
             <div className={"flex gap-2 items-center"}>
                 <NavigationBurger/>
-                <Link href={"/dashboard"} className={"text-2xl"}>Mosa</Link>
+                <Link href={"/dashboard"} className={"text-2xl font-semibold"}>Mosa</Link>
             </div>
             <AvatarHeader user={user}/>
         </div>

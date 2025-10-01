@@ -44,8 +44,11 @@ const BudgetRow = (
                     </Avatar>
                     <div className="flex flex-col">
                         <h3 className="font-medium text-gray-900">{category.name}</h3>
+                        {budgetPercentage <= 0 && (
+                            <p className="text-xs text-gray-500">Aucun budget défini</p>
+                        )}
                         <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <p>{categoryExpense} € / {budgetAmount} €</p>
+                            {budgetPercentage > 0 && <p>{categoryExpense} € / {budgetAmount} €</p>}
                             {isOverBudget && (
                                 <Badge variant="destructive" className="gap-1 text-xs">
                                     <AlertTriangleIcon className="w-3 h-3" />
@@ -94,16 +97,18 @@ const BudgetRow = (
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <div className="flex flex-col gap-1">
-                <Progress value={progressPercentage}/>
-                <div className="flex justify-between text-sm text-gray-500">
-                    <p>{progressPercentage}% utilisé</p>
-                    {isOverBudget 
-                        ? <p>+{Math.abs(budgetAmount - categoryExpense)} € de dépassement</p> 
-                        : <p>{Math.abs(categoryExpense - budgetAmount)} € restant</p>
-                    }
+            {budgetPercentage > 0 &&
+                <div className="flex flex-col gap-1">
+                    <Progress value={progressPercentage}/>
+                    <div className="flex justify-between text-sm text-gray-500">
+                        <p>{progressPercentage}% utilisé</p>
+                        {isOverBudget 
+                            ? <p>+{Math.abs(budgetAmount - categoryExpense)} € de dépassement</p> 
+                            : <p>{Math.abs(categoryExpense - budgetAmount)} € restant</p>
+                        }
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     )
 }
