@@ -5,6 +5,7 @@ import SafeBankAccount from "@/src/lib/interface/safe-banck-account"
 import { useRouter } from "next/navigation"
 import BankAccountActions from "./bank-account-actions"
 import { TrendingDownIcon, TrendingUpIcon } from "lucide-react"
+import { cn } from "@/src/lib/utils"
 
 interface BankAccountCardClientProps {
     bankAccount: SafeBankAccount
@@ -28,9 +29,12 @@ const BankAccountCardClient = ({bankAccount, percentageChange}: BankAccountCardC
                 <p className={"text-xl font-bold"}>
                     {`${bankAccount.currentAmount.toString()} €`}
                 </p>
-                {percentageChange > 0 
+                {percentageChange >= 0 
                     ? (
-                        <p className={'flex gap-1 items-center text-sm text-green-700'}>
+                        <p className={cn(
+                            'flex gap-1 items-center text-sm',
+                            percentageChange === 0 ? 'text-gray-700' : 'text-green-700' 
+                        )}>
                             <TrendingUpIcon size={16}/> +{percentageChange} %
                         </p>
                     )

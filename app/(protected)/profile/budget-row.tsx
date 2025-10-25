@@ -49,7 +49,7 @@ const BudgetRow = (
                         )}
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                             {budgetPercentage > 0 && <p>{categoryExpense} € / {budgetAmount} €</p>}
-                            {isOverBudget && (
+                            {isOverBudget && budgetPercentage > 0 && (
                                 <Badge variant="destructive" className="gap-1 text-xs">
                                     <AlertTriangleIcon className="w-3 h-3" />
                                     Dépassé

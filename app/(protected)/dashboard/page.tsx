@@ -54,7 +54,7 @@ const Dashboard = async () => {
 
             <div className={"flex flex-col gap-6 md:flex-row-reverse"}>
                 {/*Bank accounts section*/}
-                <div className={"flex flex-col gap-4 md:min-w-[300px] lg:min-w-[600px]"}>
+                <div className={"flex flex-col gap-4 md:min-w-[300px] lg:min-w-[600px] lg:max-w-1/2"}>
                     <h2 className={"text-xl font-semibold"}>Comptes</h2>
                     <div className={"flex gap-4 overflow-auto pb-4"}>
                         {validBankAccounts.length > 0 && (

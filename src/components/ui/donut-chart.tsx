@@ -26,13 +26,13 @@ const DonutChart = ({
     currency = "€",
     locale = "fr-FR"
 }: DonutChartProps) => {
-    if (data.length === 0) return
-    
-    const chartData = data.map((item, index) => ({
-        name: item.name,
-        amount: item.amount,
-        fill: `var(--chart-${Math.floor(index % 5) + 1})`,
-    }));
+    const chartData = data
+        .filter(item => item.amount > 0)
+        .map((item, index) => ({
+            name: item.name,
+            amount: item.amount,
+            fill: `var(--chart-${Math.floor(index % 5) + 1})`,
+        }));
 
     const totalAmount = data.reduce((sum, item) => sum + item.amount, 0);
 
@@ -52,6 +52,8 @@ const DonutChart = ({
         return `${amount.toLocaleString(locale)}${currency}`;
     };
 
+    if (data.length === 0) return <></>
+
     return (
         <Card className='h-full'>
             <CardHeader>
@@ -60,7 +62,7 @@ const DonutChart = ({
             <CardContent>
                 <ChartContainer
                     config={chartConfig}
-                    className="mx-auto aspect-square max-h-[250px]"
+                    className="mx-auto aspect-square max-h-[300px]"
                 >
                     <PieChart>
                         <ChartTooltip
@@ -71,7 +73,7 @@ const DonutChart = ({
                             data={chartData}
                             dataKey="amount"
                             nameKey="name"
-                            innerRadius={60}
+                            innerRadius={80}
                             strokeWidth={5}
                         >
                             <Label
