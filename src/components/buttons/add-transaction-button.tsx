@@ -5,6 +5,7 @@ import {SquarePlusIcon} from "lucide-react";
 import {Button} from "@/src/components/ui/button";
 import {AddTransactionForm} from "@/src/components/forms/add-transaction-form";
 import {ResponsiveModal} from "@/src/components/ui/responsive-modal";
+import { cn } from '@/src/lib/utils';
 
 interface AddTransactionFormProps {
     categories: {
@@ -15,13 +16,14 @@ interface AddTransactionFormProps {
         id: number;
         name: string;
     }[];
+    widthFull?: boolean;
 }
 
-const AddTransactionButton = ({ categories, bankAccounts }: AddTransactionFormProps) => {
+const AddTransactionButton = ({ categories, bankAccounts, widthFull }: AddTransactionFormProps) => {
     return (
         <ResponsiveModal
             trigger={
-                <Button>
+                <Button className={cn(widthFull && 'w-full')}>
                     <SquarePlusIcon/> Nouvelle transaction
                 </Button>
             }

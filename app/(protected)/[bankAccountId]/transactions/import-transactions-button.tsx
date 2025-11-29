@@ -12,31 +12,18 @@ import {
     SelectValue,
 } from "@/src/components/ui/select";
 import { Input } from "@/src/components/ui/input";
-import Papa from "papaparse";
-import { TransactionType } from "@/app/generated/prisma";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table";
 import { toast } from "sonner";
 import { addMultipleTransactionsAction } from "@/src/lib/action/transaction-actions";
-import { parse, isValid } from 'date-fns';
+import { parserManager } from "@/src/lib/csv-importer";
+import { ParsedTransaction } from "@/src/lib/csv-importer/parsing-strategy";
 
 enum STEPS {
     UPLOAD,
     PREVIEW,
 }
 
-// Définit la structure attendue d'une ligne dans le CSV de BoursoBank
-interface BoursoBankCsvRow {
-    dateOp: string;
-    label: string;
-    amount: string;
-}
-
-type ParsedTransaction = {
-    date: Date;
-    description: string;
-    amount: number;
-    type: TransactionType;
-};
+const availableBanks = parserManager.getAvailableBanks();
 
 export default function ImportTransactionsButton({ bankAccountId }: { bankAccountId: number }) {
     const [open, setOpen] = useState(false);
@@ -44,87 +31,56 @@ export default function ImportTransactionsButton({ bankAccountId }: { bankAccoun
     const [file, setFile] = useState<File | null>(null);
     const [parsedData, setParsedData] = useState<ParsedTransaction[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedBank, setSelectedBank] = useState<string | undefined>(availableBanks[0]);
 
-    const handleFileParse = () => {
+    const handleFileParse = async () => {
         if (!file) {
             toast.error("Veuillez sélectionner un fichier.");
             return;
         }
+        if (!selectedBank) {
+            toast.error("Veuillez sélectionner une banque.");
+            return;
+        }
+        
         setIsLoading(true);
 
-        Papa.parse<BoursoBankCsvRow>(file, {
-            header: true,
-            skipEmptyLines: true,
-            delimiter: ";",
-            complete: (results) => {
-                const transactions: ParsedTransaction[] = [];
-                results.data.forEach((row, index) => {
-                    console.log(row);
-                    
-                    // Vérification que les champs requis existent
-                    if (!row.dateOp || !row.label || row.amount === undefined) {
-                        console.warn(`Ligne ${index + 2} ignorée: champs manquants.`, row);
-                        return;
-                    }
-
-                    const parsedDate = parse(row.dateOp, 'yyyy-MM-dd', new Date());
-                    if (!isValid(parsedDate)) {
-                        console.warn(`Ligne ${index + 2} ignorée: format de date invalide (${row.dateOp}).`);
-                        return;
-                    }
-
-                    const amountValue = row.amount.replace(/\s/g, '').replace(',', '.');
-                    const amount = parseFloat(amountValue);
-
-                    if (isNaN(amount)) {
-                        console.warn(`Ligne ${index + 2} ignorée: montant invalide (${row.amount}).`);
-                        return;
-                    }
-
-                    transactions.push({
-                        date: parsedDate,
-                        description: row.label,
-                        amount: Math.abs(amount),
-                        type: amount < 0 ? TransactionType.EXPENSE : TransactionType.INCOME,
-                    });
-                });
-
-                if (transactions.length === 0) {
-                    toast.error("Aucune transaction valide trouvée.", {
-                        description: "Vérifiez que le fichier CSV contient les colonnes 'dateOp', 'label', 'amount' et que le délimiteur est bien un point-virgule (;).",
-                    });
-                    setIsLoading(false);
-                    return;
-                }
-
-                setParsedData(transactions);
-                setStep(STEPS.PREVIEW);
-                setIsLoading(false);
-            },
-            error: (error) => {
-                toast.error("Erreur lors de l'analyse du fichier.", {
-                    description: error.message
-                });
-                console.error(error);
-                setIsLoading(false);
+        try {
+            const strategy = parserManager.getStrategy(selectedBank);
+            if (!strategy) {
+                throw new Error("La stratégie de parsing pour cette banque est introuvable.");
             }
-        });
+
+            const transactions = await strategy.parse(file);
+
+            if (transactions.length === 0) {
+                toast.error("Aucune transaction valide n'a été trouvée dans le fichier.", {
+                    description: "Vérifiez que le format du fichier correspond à celui de la banque sélectionnée.",
+                });
+                return;
+            }
+
+            setParsedData(transactions);
+            setStep(STEPS.PREVIEW);
+        } catch (error) {
+            toast.error("Erreur lors de l'analyse du fichier.", {
+                description: error instanceof Error ? error.message : "Une erreur inconnue est survenue."
+            });
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleConfirmImport = async () => {
         setIsLoading(true);
         try {
-            const result = await addMultipleTransactionsAction({
+            await addMultipleTransactionsAction({
                 transactions: parsedData,
                 bankAccountId,
             });
-
-            if (result.serverError) {
-                throw new Error(result.serverError);
-            }
-            
             toast.success("Transactions importées avec succès !");
-            handleClose(false)
+            handleClose(false);
         } catch (error) {
             toast.error("Erreur lors de l'importation des transactions.", {
                 description: error instanceof Error ? error.message : "Une erreur inconnue est survenue."
@@ -140,6 +96,7 @@ export default function ImportTransactionsButton({ bankAccountId }: { bankAccoun
         setParsedData([]);
         setStep(STEPS.UPLOAD);
         setIsLoading(false);
+        setSelectedBank(availableBanks[0]);
     }
 
     const handleClose = (isOpen: boolean) => {
@@ -163,12 +120,14 @@ export default function ImportTransactionsButton({ bankAccountId }: { bankAccoun
         >
             {step === STEPS.UPLOAD && (
                 <div className="flex flex-col gap-4">
-                    <Select defaultValue="boursobank" disabled>
+                    <Select value={selectedBank} onValueChange={setSelectedBank}>
                         <SelectTrigger>
                             <SelectValue placeholder="Sélectionner une banque" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="boursobank">BoursoBank</SelectItem>
+                            {availableBanks.map((bank) => (
+                                <SelectItem key={bank} value={bank}>{bank}</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                     <Input
@@ -176,7 +135,7 @@ export default function ImportTransactionsButton({ bankAccountId }: { bankAccoun
                         accept=".csv"
                         onChange={(e) => setFile(e.target.files?.[0] || null)}
                     />
-                    <Button onClick={handleFileParse} disabled={!file || isLoading}>
+                    <Button onClick={handleFileParse} disabled={!file || !selectedBank || isLoading}>
                         {isLoading ? "Analyse en cours..." : "Prévisualiser les données"}
                     </Button>
                 </div>
@@ -185,7 +144,7 @@ export default function ImportTransactionsButton({ bankAccountId }: { bankAccoun
             {step === STEPS.PREVIEW && (
                 <div className="flex flex-col gap-4">
                     <p>Voici les transactions qui seront importées. Confirmez-vous l&apos;importation ?</p>
-                    <div className="overflow-auto max-h-64">
+                    <div className="w-full overflow-auto max-h-64">
                         <div className="rounded-md border max-w-md">
                             <Table>
                                 <TableHeader>
@@ -193,6 +152,7 @@ export default function ImportTransactionsButton({ bankAccountId }: { bankAccoun
                                         <TableHead>Date</TableHead>
                                         <TableHead>Description</TableHead>
                                         <TableHead>Montant</TableHead>
+                                        <TableHead>Type</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -201,6 +161,7 @@ export default function ImportTransactionsButton({ bankAccountId }: { bankAccoun
                                             <TableCell>{transaction.date.toLocaleDateString('fr-FR')}</TableCell>
                                             <TableCell>{transaction.description}</TableCell>
                                             <TableCell>{transaction.amount.toFixed(2)}€</TableCell>
+                                            <TableCell>{transaction.type === "INCOME" ? "Revenu" : "Dépense"}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -210,7 +171,7 @@ export default function ImportTransactionsButton({ bankAccountId }: { bankAccoun
                     <div className="flex justify-end gap-2">
                          <Button variant="ghost" onClick={() => setStep(STEPS.UPLOAD)}>Retour</Button>
                         <Button onClick={handleConfirmImport} disabled={isLoading}>
-                            {isLoading ? "Importation..." : "Importer"}
+                            {isLoading ? "Importation..." : "Confirmer et Importer"}
                         </Button>
                     </div>
                 </div>
