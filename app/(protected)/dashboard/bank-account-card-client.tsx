@@ -35,7 +35,10 @@ const BankAccountCardClient = ({bankAccount, percentageChange}: BankAccountCardC
                             'flex gap-1 items-center text-sm',
                             percentageChange === 0 ? 'text-gray-700' : 'text-green-700' 
                         )}>
-                            <TrendingUpIcon size={16}/> +{percentageChange} %
+                            {percentageChange === 0 
+                                ? '~ 0 %'
+                                : <> <TrendingUpIcon size={16}/> +{percentageChange} % </>
+                            }
                         </p>
                     )
                     : (

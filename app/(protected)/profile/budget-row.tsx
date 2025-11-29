@@ -97,7 +97,7 @@ const BudgetRow = (
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            {budgetPercentage > 0 &&
+            {budgetPercentage > 0 && categoryExpense > 0 &&
                 <div className="flex flex-col gap-1">
                     <Progress value={progressPercentage}/>
                     <div className="flex justify-between text-sm text-gray-500">

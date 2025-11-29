@@ -47,7 +47,11 @@ const Dashboard = async () => {
                 </div>
                 {categories.length > 0 && bankAccountsProp.length > 0 && (
                     <div className={"md:hidden"}>
-                        <AddTransactionButton categories={serializableCategories} bankAccounts={bankAccountsProp}/>
+                        <AddTransactionButton 
+                            widthFull 
+                            categories={serializableCategories} 
+                            bankAccounts={bankAccountsProp}
+                        />
                     </div>
                 )}
             </div>
@@ -103,7 +107,11 @@ const Dashboard = async () => {
                     )}
                     {categories.length > 0 && bankAccountsProp.length > 0 && (
                         <div className={"hidden md:block"}>
-                            <AddTransactionButton categories={serializableCategories} bankAccounts={bankAccountsProp}/>
+                            <AddTransactionButton 
+                                widthFull 
+                                categories={serializableCategories} 
+                                bankAccounts={bankAccountsProp}
+                            />
                         </div>
                     )}
                 </div>

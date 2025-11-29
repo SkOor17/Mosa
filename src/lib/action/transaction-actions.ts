@@ -275,3 +275,71 @@ export const updateTransactionAction = actionClient
         revalidatePath("/dashboard")
         return {id: result.id, amount: result.amount.toNumber()}
     })
+
+const AddMultipleTransactionsSchema = z.object({
+    transactions: z.array(
+        z.object({
+            amount: z.number(),
+            type: z.enum([TransactionType.INCOME, TransactionType.EXPENSE]),
+            description: z.string(),
+            date: z.date(),
+        })
+    ),
+    bankAccountId: z.number(),
+});
+
+export const addMultipleTransactionsAction = actionClient
+    .inputSchema(AddMultipleTransactionsSchema)
+    .action(async ({ parsedInput: { transactions, bankAccountId } }) => {
+        const user = await getRequiredUser();
+
+        const category = await prisma.category.findFirst({
+            where: {
+                userId: user.id,
+                name: "Autre",
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        if (!category) {
+            throw new Error("La catégorie 'Autre' est introuvable. Veuillez la créer.");
+        }
+
+        const totalAmount = transactions.reduce((acc, t) => {
+            const formattedAmount = t.type === TransactionType.EXPENSE ? t.amount * -1 : t.amount;
+            return acc + formattedAmount;
+        }, 0);
+
+        await prisma.$transaction(async (tx) => {
+            await tx.transaction.createMany({
+                data: transactions.map((t) => {
+                    const formattedAmount = t.type === TransactionType.EXPENSE ? t.amount * -1 : t.amount;
+                    return {
+                        amount: formattedAmount,
+                        type: t.type,
+                        description: t.description,
+                        date: t.date,
+                        categoryId: category.id,
+                        userId: user.id,
+                        bankAccountId: bankAccountId,
+                    };
+                }),
+            });
+
+            await tx.bankAccount.update({
+                where: {
+                    id: bankAccountId,
+                },
+                data: {
+                    currentAmount: {
+                        increment: totalAmount,
+                    },
+                },
+            });
+        });
+
+        revalidatePath("/dashboard");
+        revalidatePath(`/${bankAccountId}/transactions`);
+    });
