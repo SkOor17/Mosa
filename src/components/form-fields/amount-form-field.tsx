@@ -21,7 +21,8 @@ const AmountFormField = <T extends FieldValues>({
       name={field}
       render={({ field }) => {
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-          const value = e.target.value;
+          const retrivedValue = e.target.value;
+          const value = retrivedValue.replace(',', '.')
           
           if (value === '') {
             field.onChange('');
