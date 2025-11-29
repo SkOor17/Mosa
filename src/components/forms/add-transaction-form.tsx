@@ -155,7 +155,7 @@ export function AddTransactionForm({ categories, bankAccounts }: AddTransactionF
                         </FormItem>
                     )}
                 />
-                <AmountFormField form={form}/>
+                <AmountFormField control={form.control} field='amount'/>
                 <FormField
                     control={form.control}
                     name="date"
