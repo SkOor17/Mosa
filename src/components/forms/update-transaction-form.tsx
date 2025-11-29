@@ -157,7 +157,7 @@ export function UpdateTransactionForm({ transaction, onClose, categories, bankAc
                         </FormItem>
                     )}
                 />
-                <AmountFormField form={form}/>
+                <AmountFormField control={form.control} field='amount'/>
                 <FormField
                     control={form.control}
                     name="date"

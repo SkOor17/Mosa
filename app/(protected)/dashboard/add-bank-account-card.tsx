@@ -17,7 +17,7 @@ const AddBankAccountCard = () => {
                     </CardContent>
                 </Card>
             }
-            title={'Nouvelle transaction}'}
+            title={'Nouveau compte bancaire'}
         >
             <AddBankAccountForm />
         </ResponsiveModal>

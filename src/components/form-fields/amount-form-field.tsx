@@ -1,37 +1,36 @@
-import { FieldPath, UseFormReturn } from "react-hook-form";
+import { Control, FieldPath, FieldValues } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
-// Interface générique qui nécessite seulement un champ amount
-interface BaseFormData {
-  amount: number;
-}
 
-interface AmountFormFieldProps<T extends BaseFormData> {
-  form: UseFormReturn<T>;
-  name?: FieldPath<T>; // Permet de spécifier un nom de champ différent si nécessaire
+interface AmountFormFieldProps<T extends FieldValues> {
+  control: Control<T>;
+  field: FieldPath<T>;
   label?: string;
   placeholder?: string;
 }
 
-const AmountFormField = <T extends BaseFormData>({
-  form,
-  name = "amount" as FieldPath<T>,
+const AmountFormField = <T extends FieldValues>({
+  control,
+  field,
   label = "Amount",
   placeholder = "0.00"
 }: AmountFormFieldProps<T>) => {
   return (
     <FormField
-      control={form.control}
-      name={name}
+      control={control}
+      name={field}
       render={({ field }) => {
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-          const value = e.target.value;
+          const retrivedValue = e.target.value;
+          const value = retrivedValue.replace(',', '.')
+          
           if (value === '') {
             field.onChange('');
             return;
           }
           
           const isValidInput = /^\d*\.?\d{0,2}$/.test(value) && !value.startsWith('00');
+          
           if (isValidInput) {
             if (value && !value.endsWith('.') && value !== '0.') {
               const num = parseFloat(value);
