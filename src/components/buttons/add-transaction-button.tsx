@@ -21,7 +21,7 @@ const AddTransactionButton = ({ categories, bankAccounts }: AddTransactionFormPr
     return (
         <ResponsiveModal
             trigger={
-                <Button className={"w-full"}>
+                <Button>
                     <SquarePlusIcon/> Nouvelle transaction
                 </Button>
             }

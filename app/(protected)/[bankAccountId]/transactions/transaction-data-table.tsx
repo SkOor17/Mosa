@@ -4,6 +4,7 @@ import AddTransactionButton from "@/src/components/buttons/add-transaction-butto
 import {DataTable} from "@/app/(protected)/[bankAccountId]/transactions/data-table";
 import {getRequiredUser} from "@/src/lib/auth-session";
 import {SummaryExpenseChart} from "@/app/(protected)/[bankAccountId]/transactions/summary-expense-chart";
+import ImportTransactionsButton from "@/app/(protected)/[bankAccountId]/transactions/import-transactions-button";
 
 const getData = async (bankAccountId: number | undefined, userId: string) => {
     const transactions = await prisma.transaction.findMany({
@@ -95,7 +96,8 @@ const TransactionDataTable = async (
     return (
         <div className={"flex flex-col gap-4"}>
             <div className={"flex flex-col"}>
-                <div className={"md:hidden"}>
+                <div className={"md:hidden flex gap-2"}>
+                    <ImportTransactionsButton bankAccountId={bankAccountId} />
                     <AddTransactionButton categories={categories} bankAccounts={bankAccountsProp}/>
                 </div>
                 <DataTable
@@ -103,7 +105,12 @@ const TransactionDataTable = async (
                     categoryOptions={categoryOptions}
                     categories={categories}
                     bankAccounts={bankAccountsProp}
-                    addButton={<AddTransactionButton categories={categories} bankAccounts={bankAccountsProp}/>}
+                    addButton={
+                        <div className={"flex gap-2"}>
+                            <ImportTransactionsButton bankAccountId={bankAccountId} />
+                            <AddTransactionButton categories={categories} bankAccounts={bankAccountsProp}/>
+                        </div>
+                    }
                 />
             </div>
             {expenseCategories &&
