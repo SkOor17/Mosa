@@ -1,7 +1,7 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect width="512" height="512" fill="#F3EFE7"/>
     
-    <g id="Mosa-Bars">
+    <g id="Mosa-Bars" transform="translate(-15, -2)">
         <rect x="66" y="66" width="110" height="380" rx="55" fill="#8F867A"/>
         
         <rect x="216" y="150" width="110" height="300" rx="55" fill="#DBCFB7"/>
