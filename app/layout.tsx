@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Mosa",
   description: "A financial dashboard for your personal finances",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -25,6 +26,10 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
+            <head>
+                <meta name="theme-color" content="#000000" />
+                <link rel="apple-touch-icon" href="/file.svg" />
+            </head>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
