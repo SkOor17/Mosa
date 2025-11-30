@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   title: "Mosa",
   description: "A financial dashboard for your personal finances",
   manifest: "/manifest.json",
+  icons: "/mosa-logo-512.svg",
 };
 
 export default function RootLayout({
@@ -28,7 +29,6 @@ export default function RootLayout({
         <html lang="en">
             <head>
                 <meta name="theme-color" content="#000000" />
-                <link rel="apple-touch-icon" href="/file.svg" />
             </head>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
