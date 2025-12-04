@@ -1,4 +1,4 @@
-import DonutChart from "@/src/components/ui/donut-chart";
+import DonutChart from "@/src/components/charts/donut-chart";
 
 interface ExpenseCategory {
     id: number;

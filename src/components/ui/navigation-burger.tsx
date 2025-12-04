@@ -22,7 +22,7 @@ const NavigationBurger = () => {
                 <DropdownMenuLabel>Navigation</DropdownMenuLabel>
                 <DropdownMenuGroup>
                     <DropdownMenuItem>
-                        <Link href={"/dashboard"} className={"w-full flex gap-2"} onClick={() => toast.info("En développement")}>
+                        <Link href={"/summary"} className={"w-full flex gap-2"}>
                             <ChartLineIcon/> Summary
                         </Link>
                     </DropdownMenuItem>
