@@ -77,9 +77,10 @@ export default function SummaryPage() {
         )
       : [];
 
+  // TODO: Déplacer la logique du graphique annuel et mensuel dans un autre composant 
   return (
     <div className="p-4 space-y-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col gap-2 md:gap-0 md:flex-row items-start md:items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Button
             onClick={() => setView("month")}
@@ -94,7 +95,7 @@ export default function SummaryPage() {
             Year
           </Button>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col md:flex-row items-center gap-2">
           {view === "month" && (
             <Select
               value={month.toString()}

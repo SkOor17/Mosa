@@ -22,7 +22,6 @@ export default function BarChartCustom({data} : BarChartProps) {
   return (
     <ChartContainer
       config={barChartConfig}
-      className="min-h-[300px] h-[400px] w-full"
     >
       <BarChart accessibilityLayer data={data}>
         <CartesianGrid vertical={false} />
@@ -32,12 +31,12 @@ export default function BarChartCustom({data} : BarChartProps) {
           tickMargin={10}
           axisLine={false}
         />
-        <YAxis />
+        <YAxis tickMargin={10}/>
         <ChartTooltip
           cursor={false}
           content={<ChartTooltipContent hideLabel />}
         />
-        <Bar dataKey="balance" fill="var(--color-balance)" radius={8} />
+        <Bar dataKey="balance" fill="var(--color-balance)" radius={8}/>
       </BarChart>
     </ChartContainer>
   );
