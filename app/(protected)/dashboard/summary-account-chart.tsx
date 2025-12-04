@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react';
-import DonutChart from "@/src/components/ui/donut-chart";
+import DonutChart from "@/src/components/charts/donut-chart";
 
 interface BankAccount {
     id: number;
