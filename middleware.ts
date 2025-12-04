@@ -3,10 +3,17 @@ import { type NextRequest, NextResponse } from "next/server";
 const protectedRoutes = ["/dashboard", "/profile", "/summary"];
 const authRoutes = ["/signin", "/signup"];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const sessionCookie = request.cookies.get('better-auth.session_token');
   const isProtectedRoute = protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
   const isAuthRoute = authRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
+  const sessionInvalid = request.nextUrl.searchParams.get('session_invalid') === 'true'
+
+  if (sessionInvalid && sessionCookie) {
+    const response = NextResponse.redirect(new URL("/", request.url));
+    response.cookies.delete('better-auth.session_token');
+    return response;
+  }
 
   if (isProtectedRoute && !sessionCookie) {
     return NextResponse.redirect(new URL("/signin", request.url));

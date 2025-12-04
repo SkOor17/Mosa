@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { redirect, unauthorized } from "next/navigation";
+import { redirect } from "next/navigation";
 import { auth } from "./auth"; // path to your Better Auth server instance
 
 // Retrieve the user of the session
