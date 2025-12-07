@@ -22,6 +22,7 @@ export default function BarChartCustom({data} : BarChartProps) {
   return (
     <ChartContainer
       config={barChartConfig}
+      className="max-h-[80vh] w-full"
     >
       <BarChart accessibilityLayer data={data}>
         <CartesianGrid vertical={false} />

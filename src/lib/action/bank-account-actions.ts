@@ -113,3 +113,30 @@ export const removeBankAccountAction = actionClient
         revalidatePath("/dasboard")
         return { success: true };
     });
+
+export const getBankAccounts = actionClient.action(async () => {
+    const user = await getRequiredUser();
+
+    const bankAccounts = await prisma.bankAccount.findMany({
+        where: {
+            users: {
+                some: {
+                    userId: user.id,
+                },
+            },
+        },
+        select: {
+            id: true,
+            name: true,
+            initialAmount: true,
+            currentAmount: true,
+        }
+    });
+
+    return bankAccounts.map(account => ({
+        id: account.id,
+        name: account.name,
+        initialAmount: account.initialAmount.toNumber(),
+        currentAmount: account.currentAmount.toNumber(),
+    }));
+});

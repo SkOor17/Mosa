@@ -4,7 +4,7 @@ const protectedRoutes = ["/dashboard", "/profile", "/summary"];
 const authRoutes = ["/signin", "/signup"];
 
 export async function middleware(request: NextRequest) {
-  const sessionCookie = request.cookies.get('better-auth.session_token');
+  const sessionCookie = request.cookies.get('better-auth.session_token') || request.cookies.get('__Secure-better-auth.session_token');
   const isProtectedRoute = protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
   const isAuthRoute = authRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
   const sessionInvalid = request.nextUrl.searchParams.get('session_invalid') === 'true'
