@@ -25,6 +25,8 @@ import {
 } from "@/src/lib/interface/summary";
 import DonutChart from "@/src/components/charts/donut-chart";
 import BarChartCustom from "@/src/components/charts/bar-chart-custom";
+import SafeBankAccount from "@/src/lib/interface/safe-banck-account";
+import { getBankAccounts } from "@/src/lib/action/bank-account-actions";
 
 type View = "month" | "year";
 
@@ -34,6 +36,8 @@ export default function SummaryPage() {
   const [month, setMonth] = useState<number>(new Date().getMonth());
   const [yearData, setYearData] = useState<SummaryDataByYear[]>([]);
   const [monthData, setMonthData] = useState<SummaryDataByMonth[]>([]);
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("all");
+  const [bankAccounts, setBankAccounts] = useState<SafeBankAccount[]>([]);
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
@@ -41,16 +45,26 @@ export default function SummaryPage() {
     value: i,
     label: new Date(year, i).toLocaleString("default", { month: "long" }),
   }));
+  
+  useEffect(() => {
+    async function fetchBankAccounts() {
+        const result = await getBankAccounts();
+        if (result.data) {
+            setBankAccounts(result.data);
+        }
+    }
+    fetchBankAccounts();
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
       if (view === "year") {
-        const result = await getSummaryDataByYear();
+        const result = await getSummaryDataByYear({ bankAccountId: selectedAccountId });
         if (result && result.data) {
           setYearData(result.data.data);
         }
       } else {
-        const result = await getSummaryDataByMonth({ year });
+        const result = await getSummaryDataByMonth({ year, bankAccountId: selectedAccountId });
         if (result && result.data) {
           setMonthData(result.data.data);
         }
@@ -58,7 +72,7 @@ export default function SummaryPage() {
     }
 
     fetchData();
-  }, [view, year]);
+  }, [view, year, selectedAccountId]);
 
   const yearChartData = yearData.map((d) => ({
     dataKey: d.year.toString(),
@@ -96,6 +110,19 @@ export default function SummaryPage() {
           </Button>
         </div>
         <div className="flex flex-col md:flex-row items-center gap-2">
+          <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
+            <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select account" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem value="all">All Accounts</SelectItem>
+                {bankAccounts.map((acc) => (
+                    <SelectItem key={acc.id} value={acc.id.toString()}>
+                        {acc.name}
+                    </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
           {view === "month" && (
             <Select
               value={month.toString()}

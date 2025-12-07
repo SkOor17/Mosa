@@ -4,20 +4,39 @@ import {actionClient} from "@/src/lib/action";
 import {getRequiredUser} from "@/src/lib/auth-session";
 import {prisma} from "@/src/lib/prisma";
 import {z} from "zod";
-import {TransactionType} from "@/app/generated/prisma";
+import {Prisma, TransactionType} from "@/app/generated/prisma";
 import {SummaryDataByMonth, SummaryDataByYear} from "@/src/lib/interface/summary";
 
 const GetSummaryDataByMonthSchema = z.object({
     year: z.number(),
+    bankAccountId: z.string().optional(),
 });
 
 export const getSummaryDataByMonth = actionClient
     .inputSchema(GetSummaryDataByMonthSchema)
-    .action(async ({parsedInput: {year}}): Promise<{ data: SummaryDataByMonth[] }> => {
+    .action(async ({parsedInput: {year, bankAccountId}}): Promise<{ data: SummaryDataByMonth[] }> => {
         const user = await getRequiredUser();
 
+        const transactionWhere: Prisma.TransactionWhereInput = {
+            userId: user.id,
+        };
+        if (bankAccountId && bankAccountId !== 'all') {
+            transactionWhere.bankAccountId = parseInt(bankAccountId);
+        }
+
+        const bankAccountWhere: Prisma.BankAccountWhereInput = {
+            users: {
+                some: {
+                    userId: user.id,
+                },
+            },
+        };
+        if (bankAccountId && bankAccountId !== 'all') {
+            bankAccountWhere.id = parseInt(bankAccountId);
+        }
+
         const firstTransaction = await prisma.transaction.findFirst({
-            where: {userId: user.id},
+            where: transactionWhere,
             orderBy: {date: 'asc'},
             select: {date: true}
         });
@@ -33,13 +52,7 @@ export const getSummaryDataByMonth = actionClient
         }
 
         const bankAccounts = await prisma.bankAccount.findMany({
-            where: {
-                users: {
-                    some: {
-                        userId: user.id,
-                    },
-                },
-            },
+            where: bankAccountWhere,
             select: {
                 currentAmount: true,
             }
@@ -60,7 +73,7 @@ export const getSummaryDataByMonth = actionClient
 
         const transactions = await prisma.transaction.findMany({
             where: {
-                userId: user.id,
+                ...transactionWhere,
                 date: {
                     gte: startOfYear,
                 },
@@ -124,7 +137,7 @@ export const getSummaryDataByMonth = actionClient
             total: data.total,
             expensesByCategory: data.expensesByCategory,
         }));
-        
+
         const firstTransactionDate = firstTransaction.date;
         if (year < firstTransactionDate.getFullYear()) {
             result.forEach(r => r.total = 0);
@@ -139,66 +152,88 @@ export const getSummaryDataByMonth = actionClient
         return {data: result};
     });
 
-export const getSummaryDataByYear = actionClient.action(async (): Promise<{ data: SummaryDataByYear[] }> => {
-    const user = await getRequiredUser();
-
-    const firstTransaction = await prisma.transaction.findFirst({
-        where: {userId: user.id},
-        orderBy: {date: 'asc'},
-        select: {date: true}
-    });
-
-    if (!firstTransaction) {
-        return {data: [{year: new Date().getFullYear(), total: 0}]};
-    }
-
-    const bankAccounts = await prisma.bankAccount.findMany({
-        where: {users: {some: {userId: user.id}}},
-        select: {currentAmount: true}
-    });
-    const totalCurrentAmount = bankAccounts.reduce((sum, acc) => sum + acc.currentAmount.toNumber(), 0);
-
-    const transactions = await prisma.transaction.findMany({
-        where: {
-            userId: user.id,
-        },
-        select: {
-            date: true,
-            amount: true,
-        },
-        orderBy: {
-            date: "asc",
-        },
-    });
-
-    const yearlyData: { [year: number]: { total: number } } = {};
-    const transactionTotalByYear: { [year: number]: number } = {};
-
-    transactions.forEach(t => {
-        const year = t.date.getFullYear();
-        if (!transactionTotalByYear[year]) {
-            transactionTotalByYear[year] = 0;
-        }
-        transactionTotalByYear[year] += t.amount.toNumber();
-    });
-
-    const minYear = firstTransaction.date.getFullYear();
-    const maxYear = new Date().getFullYear();
-
-    const allTransactionsAmount = transactions.reduce((sum, t) => sum + t.amount.toNumber(), 0);
-
-    let yearlyBalance = totalCurrentAmount - allTransactionsAmount;
-
-    for (let year = minYear; year <= maxYear; year++) {
-        const yearTotal = transactionTotalByYear[year] || 0;
-        yearlyBalance += yearTotal;
-        yearlyData[year] = {total: yearlyBalance};
-    }
-
-    const result = Object.entries(yearlyData).map(([year, data]) => ({
-        year: parseInt(year),
-        total: data.total,
-    }));
-
-    return {data: result};
+const GetSummaryDataByYearSchema = z.object({
+    bankAccountId: z.string().optional(),
 });
+
+export const getSummaryDataByYear = actionClient
+    .inputSchema(GetSummaryDataByYearSchema)
+    .action(async ({parsedInput: {bankAccountId}}): Promise<{ data: SummaryDataByYear[] }> => {
+        const user = await getRequiredUser();
+
+        const transactionWhere: Prisma.TransactionWhereInput = {
+            userId: user.id,
+        };
+        if (bankAccountId && bankAccountId !== 'all') {
+            transactionWhere.bankAccountId = parseInt(bankAccountId);
+        }
+
+        const bankAccountWhere: Prisma.BankAccountWhereInput = {
+            users: {
+                some: {
+                    userId: user.id,
+                },
+            },
+        };
+        if (bankAccountId && bankAccountId !== 'all') {
+            bankAccountWhere.id = parseInt(bankAccountId);
+        }
+
+        const firstTransaction = await prisma.transaction.findFirst({
+            where: transactionWhere,
+            orderBy: {date: 'asc'},
+            select: {date: true}
+        });
+
+        if (!firstTransaction) {
+            return {data: [{year: new Date().getFullYear(), total: 0}]};
+        }
+
+        const bankAccounts = await prisma.bankAccount.findMany({
+            where: bankAccountWhere,
+            select: {currentAmount: true}
+        });
+        const totalCurrentAmount = bankAccounts.reduce((sum, acc) => sum + acc.currentAmount.toNumber(), 0);
+
+        const transactions = await prisma.transaction.findMany({
+            where: transactionWhere,
+            select: {
+                date: true,
+                amount: true,
+            },
+            orderBy: {
+                date: "asc",
+            },
+        });
+
+        const yearlyData: { [year: number]: { total: number } } = {};
+        const transactionTotalByYear: { [year: number]: number } = {};
+
+        transactions.forEach(t => {
+            const year = t.date.getFullYear();
+            if (!transactionTotalByYear[year]) {
+                transactionTotalByYear[year] = 0;
+            }
+            transactionTotalByYear[year] += t.amount.toNumber();
+        });
+
+        const minYear = firstTransaction.date.getFullYear();
+        const maxYear = new Date().getFullYear();
+
+        const allTransactionsAmount = transactions.reduce((sum, t) => sum + t.amount.toNumber(), 0);
+
+        let yearlyBalance = totalCurrentAmount - allTransactionsAmount;
+
+        for (let year = minYear; year <= maxYear; year++) {
+            const yearTotal = transactionTotalByYear[year] || 0;
+            yearlyBalance += yearTotal;
+            yearlyData[year] = {total: yearlyBalance};
+        }
+
+        const result = Object.entries(yearlyData).map(([year, data]) => ({
+            year: parseInt(year),
+            total: data.total,
+        }));
+
+        return {data: result};
+    });
